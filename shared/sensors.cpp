@@ -84,6 +84,7 @@ void ISR_ATTR toothISR() {
   lastUs = now;
 
   if (count >= WINDOW_TEETH) {
+    // comment
     // stamp from WINDOW_TEETH pulses ago (oldest slot when window == TEETH)
     uint8_t idx = (head + TEETH - WINDOW_TEETH) % TEETH;
     windowUs = now - stamps[idx];                // unsigned maths survives micros() rollover
