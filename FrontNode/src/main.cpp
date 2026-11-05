@@ -7,13 +7,16 @@
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 
-
-int setup() {
+void setup() {
   // Initialize CAN bus
+  Can1.begin();
+  Can1.setBaudRate(500000);
+
   // Initialize sensors
+
 }
 
-int loop() {
+void loop() {
   // Read sensors
   // Send CAN frame
 }
