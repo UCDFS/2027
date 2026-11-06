@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Metadata and mechanical telemetry typography. -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mechanical Telemetry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Consistent box sizing makes Figma-based dimensions predictable. */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Fill the viewport before centering the dashboard canvas. */
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        background: #07131f;
+      }
+
+      /* Fixed 800x480 canvas with the shared background and 80% navy scrim. */
+      .dashboard-screen {
+        position: relative;
+        width: 800px;
+        height: 480px;
+        overflow: hidden;
+        background:
+          linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
+          url("dashBg.jpg") lightgray 50% / cover no-repeat;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
+      }
+
+      /* Low-opacity, centered FS artwork behind all telemetry cards. */
+      .fs-logo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 360px;
+        height: 314px;
+        transform: translate(-50%, -50%);
+        background: url("fslogo-transparent.png") transparent -32.349px -194.254px / 115.052% 161.864% no-repeat;
+        opacity: 0.25;
+        mix-blend-mode: screen;
+        filter: blur(1px);
+      }
+
+      /* Page title, live/placeholder state indicator, and menu position. */
+      .telemetry-header {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        display: flex;
+        height: 44px;
+        align-items: center;
+        padding: 0 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        color: #aab5c8;
+        font-family: "Josefin Slab", Georgia, serif;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+
+      .telemetry-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .telemetry-icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      .telemetry-status {
+        margin-left: auto;
+        margin-right: 120px;
+        color: #aab5c8;
+        font-size: 10px;
+        letter-spacing: 1.2px;
+        white-space: nowrap;
+      }
+
+      .status-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 6px;
+        border-radius: 50%;
+        background: #8993a6;
+        vertical-align: 1px;
+      }
+
+      .status-dot.is-live {
+        background: #26ff33;
+        box-shadow: 0 0 7px rgba(38, 255, 51, 0.65);
+      }
+
+      /* Navigation menu controls and dropdown. */
+      .dashboard-menu {
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        z-index: 4;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .menu-toggle {
+        display: flex;
+        width: 96px;
+        height: 36px;
+        padding: 8px 12px;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 0;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.902);
+        color: #0b1220;
+        font: 600 13px/1 "Josefin Slab", Georgia, serif;
+        cursor: pointer;
+      }
+
+      .menu-toggle:hover {
+        background: #fff;
+      }
+
+      .menu-toggle:focus-visible,
+      .menu-item:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+      }
+
+      .menu-icon {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+      }
+
+      .menu-panel {
+        position: absolute;
+        top: 44px;
+        right: 0;
+        width: 224px;
+        padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        background: rgba(11, 18, 32, 0.97);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .menu-panel[hidden] {
+        display: none;
+      }
+
+      .menu-item {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.9);
+        text-align: left;
+        text-decoration: none;
+        font: 14px/1.3 Arial, Helvetica, sans-serif;
+        cursor: pointer;
+      }
+
+      .menu-item:hover,
+      .menu-item[aria-current="page"] {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      /* Four high-level telemetry readings across the top of the canvas. */
+      .summary-grid {
+        position: absolute;
+        top: 58px;
+        right: 18px;
+        left: 18px;
+        display: grid;
+        height: 96px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      /* Shared translucent card surface for all measurements. */
+      .telemetry-card {
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.055);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.015);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+      }
+
+      .summary-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+      }
+
+      .summary-card:nth-child(2),
+      .brake-card:first-child {
+        border-color: rgba(224, 120, 71, 0.16);
+      }
+
+      .summary-card:nth-child(3) {
+        border-color: rgba(139, 103, 210, 0.20);
+      }
+
+      .summary-card:nth-child(4) {
+        border-color: rgba(85, 178, 160, 0.18);
+      }
+
+      /* Labels use the requested blue-gray uppercase typography. */
+      .metric-label {
+        color: #adc4e0;
+        font-family: "Josefin Slab", Georgia, serif;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-align: center;
+        text-transform: uppercase;
+        line-height: normal;
+      }
+
+      /* Numeric measurements use the large, high-contrast display style. */
+      .metric-reading {
+        color: #f1f5f9;
+        font-family: "Josefin Slab", Georgia, serif;
+        font-size: 40px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        white-space: nowrap;
+      }
+
+      .metric-unit {
+        margin-left: 3px;
+        color: #c3cada;
+        font-family: "Josefin Slab", Georgia, serif;
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      /* Lower area: car-style suspension display at left and brake values at right. */
+      .lower-grid {
+        position: absolute;
+        top: 170px;
+        right: 18px;
+        bottom: 18px;
+        left: 18px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .suspension-panel {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .section-title {
+        margin: 0 0 0 76px;
+        color: #aeb8ca;
+        font-family: "Josefin Slab", Georgia, serif;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 1.5px;
+        line-height: 18px;
+        text-transform: uppercase;
+      }
+
+      /* Four cards arranged around the centered vehicle/axle diagram. */
+      .suspension-grid {
+        position: relative;
+        display: grid;
+        width: 100%;
+        height: 250px;
+        flex: 0 0 250px;
+        grid-template-columns: repeat(2, minmax(0, 170px));
+        grid-template-rows: repeat(2, 120px);
+        justify-content: center;
+        align-content: center;
+        column-gap: 32px;
+        row-gap: 10px;
+      }
+
+      /* SVG axle and center lines overlay the suspension cards without blocking them. */
+      .suspension-diagram {
+        position: absolute;
+        z-index: 3;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .suspension-diagram .centerline {
+        stroke: rgba(255, 255, 255, 0.50);
+        stroke-width: 0.5;
+      }
+
+      .suspension-diagram .axle-line {
+        stroke: rgba(255, 255, 255, 0.40);
+        stroke-width: 0.5;
+      }
+
+      .suspension-diagram circle {
+        fill: rgba(255, 255, 255, 0.50);
+      }
+
+      /* Shared alignment for each suspension and brake measurement card. */
+      .suspension-card,
+      .brake-card {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+      }
+
+      .suspension-card {
+        z-index: 2;
+        width: 170px;
+        height: 120px;
+        border-color: rgba(59, 130, 246, 0.1255);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.0392);
+        gap: 2px;
+      }
+
+      .suspension-card .metric-label,
+      .suspension-card .metric-reading {
+        position: relative;
+        z-index: 4;
+      }
+
+      .suspension-card .metric-reading {
+        font-size: 34px;
+      }
+
+      /* Two brake-pressure cards share the lower-right panel. */
+      .brake-grid {
+        display: grid;
+        min-width: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .brake-card {
+        padding: 10px;
+        border-color: rgba(224, 120, 71, 0.16);
+      }
+
+      .brake-meter {
+        width: 88%;
+        height: 5px;
+        margin-top: 5px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.10);
+      }
+
+      /* Scale grids, logo, and text when the browser is narrower than the canvas. */
+      @media (max-width: 860px) {
+        .dashboard-screen {
+          width: min(90vw, 800px);
+          height: min(60vw, 480px);
+        }
+
+        .fs-logo {
+          width: 45%;
+          height: 65.4%;
+          transform: translate(-50%, -50%);
+          background-position: -9% -62%;
+          background-size: 115.052% 161.864%;
+        }
+
+        .summary-grid {
+          right: 2.25%;
+          left: 2.25%;
+          height: 20%;
+          gap: 2%;
+        }
+
+        .lower-grid {
+          top: 35.4%;
+          right: 2.25%;
+          bottom: 3.75%;
+          left: 2.25%;
+          gap: 2%;
+        }
+
+        .brake-grid {
+          gap: 2%;
+        }
+
+        .metric-label,
+        .section-title {
+          font-size: clamp(7px, 1.5vw, 12px);
+          letter-spacing: 0.8px;
+        }
+
+        .metric-reading {
+          font-size: clamp(18px, 5vw, 40px);
+        }
+
+        .metric-unit {
+          font-size: clamp(8px, 1.5vw, 12px);
+        }
+
+        .section-title {
+          margin-left: 10%;
+        }
+
+        .suspension-grid {
+          grid-template-columns: repeat(2, minmax(0, 170px));
+        }
+
+        .suspension-card {
+          width: 100%;
+        }
+
+        .telemetry-header {
+          padding: 0 2.25%;
+          font-size: clamp(8px, 1.5vw, 12px);
+        }
+
+        .telemetry-status {
+          margin-right: 105px;
+          font-size: clamp(6px, 1.25vw, 10px);
+        }
+
+        .dashboard-menu {
+          right: 2%;
+        }
+
+        .menu-toggle {
+          width: 88px;
+          height: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Mechanical telemetry page. CAN data is not read directly in this browser;
+      see updateMechTelemetry(...) and the "can-telemetry" event listener below
+      for the exact decoded data handoff expected from a Pi-side backend.
+    -->
+    <main class="dashboard-screen" aria-label="Mechanical telemetry dashboard">
+      <div class="fs-logo" role="img" aria-label="Formula Student logo"></div>
+      <!-- Page title and status text change from placeholder to live on valid updates. -->
+      <header class="telemetry-header">
+        <div class="telemetry-title">
+          <svg class="telemetry-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M7 1.5h6v2h2.5V6H18v8h-2.5v2.5H13v2H7v-2H4.5V14H2V6h2.5V3.5H7v-2Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6.5 6.5h7v7h-7zM8.5 8.5h3v3h-3z" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+          <span>Mech Telemetry</span>
+        </div>
+        <div class="telemetry-status" id="telemetry-status" role="status">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Placeholder readings</span>
+        </div>
+      </header>
+      <!-- Links navigate between pages; none of these links carries CAN data. -->
+      <div class="dashboard-menu">
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="menu-panel"
+        >
+          <svg class="menu-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 4h12M2 8h12M2 12h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+          <span>Menu</span>
+        </button>
+        <nav class="menu-panel" id="menu-panel" aria-label="Dashboard menu" hidden>
+          <a class="menu-item" href="dash.html">Driver selection</a>
+          <a class="menu-item" href="default-driver.html">Default driver dash</a>
+          <a class="menu-item" href="mech-telemetry.html" aria-current="page">Mechanical telemetry</a>
+        </nav>
+      </div>
+      <!-- Four summary metrics are updated by the keyed telemetry map below. -->
+      <section class="summary-grid" aria-label="Vehicle summary telemetry">
+        <article class="telemetry-card summary-card">
+          <span class="metric-label">DC Bus Voltage</span>
+          <span class="metric-reading"><span id="dc-bus-voltage">000.0</span><span class="metric-unit">V</span></span>
+        </article>
+        <article class="telemetry-card summary-card">
+          <span class="metric-label">Motor Temp</span>
+          <span class="metric-reading"><span id="motor-temp">00.0</span><span class="metric-unit">°C</span></span>
+        </article>
+        <article class="telemetry-card summary-card">
+          <span class="metric-label">Inverter Temp</span>
+          <span class="metric-reading"><span id="inverter-temp">00.0</span><span class="metric-unit">°C</span></span>
+        </article>
+        <article class="telemetry-card summary-card">
+          <span class="metric-label">Steering Angle</span>
+          <span class="metric-reading"><span id="steering-angle">000.0</span><span class="metric-unit">°</span></span>
+        </article>
+      </section>
+      <!-- Suspension and brake readings occupy the lower half of the 800x480 canvas. -->
+      <section class="lower-grid" aria-label="Suspension and brake telemetry">
+        <div class="suspension-panel">
+          <h2 class="section-title">Suspension Travel (mm)</h2>
+          <div class="suspension-grid">
+            <article class="telemetry-card suspension-card">
+              <span class="metric-label">Front Left</span>
+              <span class="metric-reading"><span id="front-left">00.0</span><span class="metric-unit">mm</span></span>
+            </article>
+            <article class="telemetry-card suspension-card">
+              <span class="metric-label">Front Right</span>
+              <span class="metric-reading"><span id="front-right">00.0</span><span class="metric-unit">mm</span></span>
+            </article>
+            <article class="telemetry-card suspension-card">
+              <span class="metric-label">Back Left</span>
+              <span class="metric-reading"><span id="back-left">00.0</span><span class="metric-unit">mm</span></span>
+            </article>
+            <article class="telemetry-card suspension-card">
+              <span class="metric-label">Back Right</span>
+              <span class="metric-reading"><span id="back-right">00.0</span><span class="metric-unit">mm</span></span>
+            </article>
+            <!-- Decorative axle diagram; numeric readings stay in the four cards above. -->
+            <svg class="suspension-diagram" viewBox="0 0 374 250" preserveAspectRatio="none" aria-hidden="true">
+              <line class="centerline" x1="187" y1="16" x2="187" y2="234" />
+              <line class="axle-line" x1="144" y1="60" x2="230" y2="60" />
+              <line class="axle-line" x1="144" y1="190" x2="230" y2="190" />
+              <circle cx="187" cy="16" r="1.5" />
+              <circle cx="187" cy="234" r="1.5" />
+              <circle cx="144" cy="60" r="1.5" />
+              <circle cx="230" cy="60" r="1.5" />
+              <circle cx="144" cy="190" r="1.5" />
+              <circle cx="230" cy="190" r="1.5" />
+            </svg>
+          </div>
+        </div>
+        <!-- Brake pressure fields use bar and are updated through their mapped IDs. -->
+        <div class="brake-grid">
+          <article class="telemetry-card brake-card">
+            <span class="metric-label">Front Brake Pressure</span>
+            <span class="metric-reading"><span id="front-brake-pressure">000.0</span><span class="metric-unit">bar</span></span>
+            <span class="brake-meter" aria-hidden="true"></span>
+          </article>
+          <article class="telemetry-card brake-card">
+            <span class="metric-label">Rear Brake Pressure</span>
+            <span class="metric-reading"><span id="rear-brake-pressure">000.0</span><span class="metric-unit">bar</span></span>
+            <span class="brake-meter" aria-hidden="true"></span>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script>
+      /*
+       * CAN field-to-display map and expected engineering units:
+       * dcBusVoltage (V), motorTemp/inverterTemp (degrees C),
+       * steeringAngle (degrees), suspension corners (mm), brake pressures (bar).
+       * Decode CAN signal scaling and convert units on the Pi/backend before calling
+       * the page API; display formatting here only adds one decimal place.
+       */
+      const telemetryFields = {
+        dcBusVoltage: { element: document.querySelector("#dc-bus-voltage"), digits: 1 },
+        motorTemp: { element: document.querySelector("#motor-temp"), digits: 1 },
+        inverterTemp: { element: document.querySelector("#inverter-temp"), digits: 1 },
+        steeringAngle: { element: document.querySelector("#steering-angle"), digits: 1 },
+        frontLeft: { element: document.querySelector("#front-left"), digits: 1 },
+        frontRight: { element: document.querySelector("#front-right"), digits: 1 },
+        backLeft: { element: document.querySelector("#back-left"), digits: 1 },
+        backRight: { element: document.querySelector("#back-right"), digits: 1 },
+        frontBrakePressure: { element: document.querySelector("#front-brake-pressure"), digits: 1 },
+        rearBrakePressure: { element: document.querySelector("#rear-brake-pressure"), digits: 1 },
+      };
+      // Status indicates that at least one valid payload has been applied.
+      const telemetryStatusText = document.querySelector("#status-text");
+      const telemetryStatusDot = document.querySelector("#status-dot");
+
+      /*
+       * Primary Pi/backend handoff. Pass a partial object using the keys above,
+       * e.g. { dcBusVoltage: 400.2, frontLeft: 12.5 }. Each supplied value must
+       * be a finite JavaScript number in the documented unit. Unsent fields keep
+       * their previous display value; unknown keys and invalid values throw.
+       */
+      window.updateMechTelemetry = (readings) => {
+        if (!readings || typeof readings !== "object" || Array.isArray(readings)) {
+          throw new TypeError("Mechanical telemetry readings must be an object.");
+        }
+
+        for (const [key, value] of Object.entries(readings)) {
+          const field = telemetryFields[key];
+          if (!field) {
+            throw new RangeError(`Unknown mechanical telemetry field: ${key}`);
+          }
+          if (typeof value !== "number" || !Number.isFinite(value)) {
+            throw new TypeError(`Telemetry value "${key}" must be a finite number.`);
+          }
+          field.element.textContent = value.toFixed(field.digits);
+        }
+
+        telemetryStatusText.textContent = "Live readings";
+        telemetryStatusDot.classList.add("is-live");
+      };
+
+      /*
+       * Event-based bridge alternative:
+       * dispatchEvent(new CustomEvent("can-telemetry", { detail: decodedReadings }))
+       * on this page's window after receiving a message from the Pi service.
+       * The page does not create that network connection or parse raw CAN frames.
+       */
+      window.addEventListener("can-telemetry", (event) => {
+        window.updateMechTelemetry(event.detail);
+      });
+
+      // Menu behavior is local navigation only and is independent of telemetry.
+      const menuToggle = document.querySelector("#menu-toggle");
+      const menuPanel = document.querySelector("#menu-panel");
+
+      menuToggle.addEventListener("click", () => {
+        const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+        menuToggle.setAttribute("aria-expanded", String(!isExpanded));
+        menuPanel.hidden = isExpanded;
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".dashboard-menu")) {
+          menuToggle.setAttribute("aria-expanded", "false");
+          menuPanel.hidden = true;
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          menuToggle.setAttribute("aria-expanded", "false");
+          menuPanel.hidden = true;
+          menuToggle.focus();
+        }
+      });
+    </script>
+  </body>
+</html>
