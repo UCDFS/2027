@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Metadata and the two typefaces used by driver identity and metric labels. -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Default Driver Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Use predictable sizing throughout the fixed 800x480 dashboard canvas. */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Fill the viewport before centering the dashboard canvas. */
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        background: #07131f;
+      }
+
+      /* Main driver display; the dark overlay matches the other dashboard pages. */
+      .dashboard-screen {
+        position: relative;
+        width: 800px;
+        height: 480px;
+        background:
+          linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
+          url("dashBg.jpg") lightgray 50% / cover no-repeat;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
+      }
+
+      /* Navigation dropdown shared by the dashboard pages. */
+      .dashboard-menu {
+        position: absolute;
+        top: 10px;
+        right: 16px;
+        z-index: 3;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .menu-toggle {
+        display: flex;
+        width: 124px;
+        height: 36px;
+        padding: 8px 12px;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 0;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.902);
+        color: #0b1220;
+        font: 600 13px/1 Arial, Helvetica, sans-serif;
+        cursor: pointer;
+      }
+
+      .menu-toggle:hover {
+        background: #fff;
+      }
+
+      .menu-toggle:focus-visible,
+      .menu-item:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+      }
+
+      .menu-icon {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+      }
+
+      .menu-panel {
+        position: absolute;
+        top: 44px;
+        right: 0;
+        width: 224px;
+        padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        background: rgba(11, 18, 32, 0.96);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .menu-panel[hidden] {
+        display: none;
+      }
+
+      .menu-item {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.9);
+        text-align: left;
+        text-decoration: none;
+        font: 14px/1.3 Arial, Helvetica, sans-serif;
+        cursor: pointer;
+      }
+
+      .menu-item:hover,
+      .menu-item[aria-current="page"] {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      /* Driver identity label and name in the upper-left corner. */
+      .driver-identity {
+        position: absolute;
+        top: 24px;
+        left: 48px;
+        display: flex;
+        width: 220px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        font-family: "Rajdhani", sans-serif;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .driver-label {
+        align-self: stretch;
+        color: #6b7280;
+        font-size: 13px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: 1.2px;
+      }
+
+      .driver-name {
+        align-self: stretch;
+        color: #fff;
+        font-size: 40px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+      }
+
+      /* Shared circle layout and soft white backing for the metric gauges. */
+      .metric {
+        position: absolute;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #141925;
+        font-family: "Josefin Slab", Georgia, serif;
+        text-align: center;
+      }
+
+      .metric::before {
+        position: absolute;
+        z-index: -1;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.90);
+        content: "";
+        filter: blur(4px);
+        inset: 4px;
+      }
+
+      .rpm-segments {
+        position: absolute;
+        z-index: 0;
+        top: -22px;
+        left: -22px;
+        width: 184px;
+        height: 184px;
+        overflow: visible;
+      }
+
+      .metric-label {
+        position: relative;
+        z-index: 1;
+        color: #697180;
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+      }
+
+      .metric-value {
+        position: relative;
+        z-index: 1;
+        margin-top: 6px;
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1;
+      }
+
+      /* RPM gauge: 140px face with the 184px SVG segment ring. */
+      .metric-rpm {
+        top: 35.6%;
+        left: 9.5%;
+        width: 140px;
+        height: 140px;
+      }
+
+      /* Large center speed readout and its unit. */
+      .metric-speed {
+        top: 24.6%;
+        left: 33.25%;
+        width: 240px;
+        height: 240px;
+      }
+
+      .metric-speed .metric-label {
+        font-size: 18px;
+      }
+
+      .metric-speed .metric-value {
+        font-size: 72px;
+        font-weight: 700;
+      }
+
+      .metric-speed .metric-unit {
+        font-size: 54px;
+        font-weight: 700;
+      }
+
+      /* Smaller torque gauge above the main speed display. */
+      .metric-torque {
+        top: 2.3%;
+        left: 61.25%;
+        width: 140px;
+        height: 140px;
+      }
+
+      /* Battery gauge face and its independently positioned segment ring. */
+      .metric-battery {
+        top: 30%;
+        left: 72.75%;
+        width: 200px;
+        height: 200px;
+      }
+
+      .metric-battery::before {
+        inset: 34px;
+      }
+
+      .battery-segments {
+        position: absolute;
+        z-index: 0;
+        top: 4px;
+        left: 4px;
+        width: 192px;
+        height: 192px;
+        overflow: visible;
+      }
+
+      /* Motor temperature gauge in the lower-right area. */
+      .metric-motor-temp {
+        top: 68.7%;
+        left: 60.1%;
+        width: 140px;
+        height: 140px;
+      }
+
+      /* Decorative Formula Student logo in the lower-left of the canvas. */
+      .fs-logo {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 184px;
+        height: 149px;
+        background: url("fslogo-transparent.png") transparent -16.534px -92.178px / 115.052% 161.864% no-repeat;
+        opacity: 0.45;
+        mix-blend-mode: screen;
+        filter: blur(1px);
+      }
+
+      /* Preserve relative gauge placement while scaling the dashboard responsively. */
+      @media (max-width: 860px) {
+        .dashboard-screen {
+          width: min(90vw, 800px);
+          height: min(60vw, 480px);
+        }
+
+        .dashboard-menu {
+          top: 8px;
+          right: 8px;
+        }
+
+        .driver-identity {
+          top: 5%;
+          left: 5%;
+          width: 27.5%;
+          gap: 2.5vw;
+        }
+
+        .driver-name {
+          font-size: clamp(24px, 5vw, 40px);
+        }
+
+        .metric-rpm,
+        .metric-torque,
+        .metric-motor-temp {
+          width: 17.5%;
+          height: 29.17%;
+        }
+
+        .metric-battery {
+          width: 25%;
+          height: 41.67%;
+        }
+
+        .metric-battery::before {
+          inset: 17%;
+        }
+
+        .battery-segments {
+          top: 2%;
+          left: 2%;
+          width: 96%;
+          height: 96%;
+        }
+
+        .metric-speed {
+          width: 30%;
+          height: 50%;
+        }
+
+        .metric-value {
+          font-size: clamp(14px, 3.5vw, 28px);
+        }
+
+        .metric-speed .metric-value {
+          font-size: clamp(30px, 9vw, 72px);
+        }
+
+        .metric-speed .metric-unit {
+          font-size: clamp(24px, 6.75vw, 54px);
+        }
+
+        .metric-label {
+          font-size: clamp(9px, 1.9vw, 15px);
+        }
+
+        .metric-speed .metric-label {
+          font-size: clamp(11px, 2.25vw, 18px);
+        }
+
+        .fs-logo {
+          width: 23%;
+          height: 31%;
+          background-position: -9% -62%;
+          background-size: 115.052% 161.864%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Live values enter through updateDefaultTelemetry(...) or the
+      "can-telemetry" window event below. A Pi-side backend must decode CAN and
+      relay engineering-unit values to this browser; this page does not read CAN.
+    -->
+    <main class="dashboard-screen" aria-label="Default driver dashboard">
+      <div class="fs-logo" role="img" aria-label="Formula Student logo"></div>
+      <!-- Driver identity is session-scoped; no selection displays "Default". -->
+      <section class="driver-identity" aria-label="Current driver">
+        <span class="driver-label">Driver</span>
+        <span class="driver-name" id="current-driver">Default</span>
+      </section>
+      <div class="dashboard-menu">
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="menu-panel"
+        >
+          <svg class="menu-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 4h12M2 8h12M2 12h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+          <span>Menu</span>
+        </button>
+        <nav class="menu-panel" id="menu-panel" aria-label="Dashboard menu" hidden>
+          <a class="menu-item" href="dash.html">Driver selection</a>
+          <a class="menu-item" href="default-driver.html" aria-current="page">Default driver dash</a>
+          <a class="menu-item" href="mech-telemetry.html">Mechanical telemetry</a>
+          <button class="menu-item" type="button" data-menu-action="event-one">Event 1</button>
+          <button class="menu-item" type="button" data-menu-action="event-two">Event 2</button>
+        </nav>
+      </div>
+      <!-- RPM face and static SVG ticks; script recolors ticks as RPM changes. -->
+      <section class="metric metric-rpm" aria-label="Engine speed" data-redline-rpm="12000">
+        <svg class="rpm-segments" xmlns="http://www.w3.org/2000/svg" width="184" height="184" viewBox="0 0 184 184" fill="none" aria-hidden="true">
+          <rect x="37.376" y="144.856" width="2.5" height="16" rx="1" transform="rotate(45 37.376 144.856)" fill="#576375"/>
+          <rect x="29.78" y="135.66" width="2.50001" height="16" rx="1" transform="rotate(54 29.78 135.66)" fill="#576375"/>
+          <rect x="23.716" y="125.39" width="2.5" height="16" rx="1" transform="rotate(63 23.716 125.39)" fill="#576375"/>
+          <rect x="19.3334" y="114.296" width="2.5" height="16" rx="1" transform="rotate(72 19.3334 114.296)" fill="#576375"/>
+          <rect x="16.7401" y="102.654" width="2.5" height="16" rx="1" transform="rotate(81 16.7401 102.654)" fill="#576375"/>
+          <rect x="16" y="90.75" width="2.5" height="16" rx="1" transform="rotate(90 16 90.75)" fill="#576375"/>
+          <rect x="17.1312" y="78.8764" width="2.5" height="16" rx="1" transform="rotate(99 17.1312 78.8764)" fill="#576375"/>
+          <rect x="20.106" y="67.3259" width="2.5" height="16" rx="1" transform="rotate(108 20.106 67.3259)" fill="#576375"/>
+          <rect x="24.851" y="56.383" width="2.5" height="16" rx="1" transform="rotate(117 24.851 56.383)" fill="#576375"/>
+          <rect x="31.2494" y="46.317" width="2.5" height="16" rx="1" transform="rotate(126 31.2494 46.317)" fill="#576375"/>
+          <rect x="39.1438" y="37.376" width="2.5" height="16" rx="1" transform="rotate(135 39.1438 37.376)" fill="#576375"/>
+          <rect x="48.3396" y="29.78" width="2.5" height="16" rx="1" transform="rotate(144 48.3396 29.78)" fill="#576375"/>
+          <rect x="58.6105" y="23.716" width="2.5" height="16" rx="1" transform="rotate(153 58.6105 23.716)" fill="#576375"/>
+          <rect x="69.7035" y="19.3334" width="2.5" height="16" rx="1" transform="rotate(162 69.7035 19.3334)" fill="#576375"/>
+          <rect x="81.3456" y="16.7401" width="2.5" height="16" rx="1" transform="rotate(171 81.3456 16.7401)" fill="#576375"/>
+          <rect x="93.25" y="16" width="2.5" height="16" rx="1" transform="rotate(-180 93.25 16)" fill="#576375"/>
+          <rect x="105.124" y="17.1312" width="2.50001" height="16" rx="1" transform="rotate(-171 105.124 17.1312)" fill="#576375"/>
+          <rect x="116.674" y="20.106" width="2.5" height="16" rx="1" transform="rotate(-162 116.674 20.106)" fill="#576375"/>
+          <rect x="127.617" y="24.851" width="2.5" height="16" rx="1" transform="rotate(-153 127.617 24.851)" fill="#576375"/>
+          <rect x="137.683" y="31.2494" width="2.5" height="16" rx="1" transform="rotate(-144 137.683 31.2494)" fill="#576375"/>
+          <rect x="146.624" y="39.1438" width="2.5" height="16" rx="1" transform="rotate(-135 146.624 39.1438)" fill="#576375"/>
+          <rect x="154.22" y="48.3396" width="2.5" height="16" rx="1" transform="rotate(-126 154.22 48.3396)" fill="#576375"/>
+          <rect x="160.284" y="58.6105" width="2.5" height="16" rx="1" transform="rotate(-117 160.284 58.6105)" fill="#576375"/>
+          <rect x="164.667" y="69.7035" width="2.5" height="16" rx="1" transform="rotate(-108 164.667 69.7035)" fill="#576375"/>
+          <rect x="167.26" y="81.3456" width="2.5" height="16" rx="1" transform="rotate(-99 167.26 81.3456)" fill="#576375"/>
+          <rect x="168" y="93.25" width="2.5" height="16" rx="1" transform="rotate(-90 168 93.25)" fill="#576375"/>
+          <rect x="166.869" y="105.124" width="2.5" height="16" rx="1" transform="rotate(-81 166.869 105.124)" fill="#576375"/>
+          <rect x="163.894" y="116.674" width="2.5" height="16" rx="1" transform="rotate(-72 163.894 116.674)" fill="#576375"/>
+          <rect x="159.149" y="127.617" width="2.5" height="16" rx="1" transform="rotate(-63 159.149 127.617)" fill="#9E7D2E"/>
+          <rect x="152.751" y="137.683" width="2.5" height="16" rx="1" transform="rotate(-54 152.751 137.683)" fill="#9E7D2E"/>
+          <rect x="144.856" y="146.624" width="2.50001" height="16" rx="1" transform="rotate(-45 144.856 146.624)" fill="#9E7D2E"/>
+          <rect x="135.66" y="154.22" width="2.5" height="16" rx="1" transform="rotate(-36 135.66 154.22)" fill="#9E7D2E"/>
+          <rect x="125.39" y="160.284" width="2.5" height="16" rx="1" transform="rotate(-27 125.39 160.284)" fill="#9E7D2E"/>
+          <rect x="114.296" y="164.667" width="2.5" height="16" rx="1" transform="rotate(-18 114.296 164.667)" fill="#9E7D2E"/>
+          <rect x="102.654" y="167.26" width="2.5" height="16" rx="1" transform="rotate(-9 102.654 167.26)" fill="#9E403D"/>
+          <rect x="90.75" y="168" width="2.5" height="16" rx="1" fill="#9E403D"/>
+          <rect x="78.8764" y="166.869" width="2.5" height="16" rx="1" transform="rotate(9 78.8764 166.869)" fill="#9E403D"/>
+          <rect x="67.3259" y="163.894" width="2.5" height="16" rx="1" transform="rotate(18 67.3259 163.894)" fill="#9E403D"/>
+          <rect x="56.383" y="159.149" width="2.5" height="16" rx="1" transform="rotate(27 56.383 159.149)" fill="#9E403D"/>
+          <rect x="46.317" y="152.751" width="2.5" height="16" rx="1" transform="rotate(36 46.317 152.751)" fill="#9E403D"/>
+        </svg>
+        <span class="metric-label">RPM</span>
+        <span class="metric-value" id="rpm-value">0.0 rpm</span>
+      </section>
+      <!-- Speed placeholder; the backend supplies speedKph to update this field. -->
+      <section class="metric metric-speed" aria-label="Vehicle speed">
+        <span class="metric-label">Speed</span>
+        <span class="metric-value" id="speed-value">00.0</span>
+        <span class="metric-unit">kph</span>
+      </section>
+      <!-- Torque placeholder; torquePercent is expected as a 0-100 percentage. -->
+      <section class="metric metric-torque" aria-label="Torque">
+        <span class="metric-label">Torque</span>
+        <span class="metric-value"><span id="torque-value">00</span>%</span>
+      </section>
+      <!-- Battery placeholder and static segment art; JavaScript controls fill and color. -->
+      <section class="metric metric-battery" aria-label="Battery charge" data-low-threshold="20" data-medium-threshold="50">
+        <svg class="battery-segments" xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 195 196" preserveAspectRatio="none" fill="none" aria-hidden="true">
+          <rect x="98.0711" y="20" width="3.5" height="18" rx="1" transform="rotate(-180 98.0711 20)" fill="#576375"/>
+          <rect x="113.255" y="21.8402" width="3.5" height="18" rx="1" transform="rotate(-168.75 113.255 21.8402)" fill="#576375"/>
+          <rect x="127.787" y="26.6071" width="3.5" height="18" rx="1" transform="rotate(-157.5 127.787 26.6071)" fill="#576375"/>
+          <rect x="141.111" y="34.1176" width="3.5" height="18" rx="1" transform="rotate(-146.25 141.111 34.1176)" fill="#576375"/>
+          <rect x="152.713" y="44.0831" width="3.5" height="18" rx="1" transform="rotate(-135 152.713 44.0831)" fill="#576375"/>
+          <rect x="162.148" y="56.1206" width="3.5" height="18" rx="1" transform="rotate(-123.75 162.148 56.1206)" fill="#576375"/>
+          <rect x="169.053" y="69.7675" width="3.5" height="18" rx="1" transform="rotate(-112.5 169.053 69.7675)" fill="#576375"/>
+          <rect x="173.164" y="84.4993" width="3.5" height="18" rx="1" transform="rotate(-101.25 173.164 84.4993)" fill="#576375"/>
+          <rect x="174.3211" y="99.75" width="3.5" height="18" rx="1" transform="rotate(-90 174.3211 99.75)" fill="#576375"/>
+          <rect x="172.481" y="114.933" width="3.5" height="18" rx="1" transform="rotate(-78.75 172.481 114.933)" fill="#576375"/>
+          <rect x="167.714" y="129.466" width="3.5" height="18" rx="1" transform="rotate(-67.5 167.714 129.466)" fill="#576375"/>
+          <rect x="160.203" y="142.79" width="3.5" height="18" rx="1" transform="rotate(-56.25 160.203 142.79)" fill="#576375"/>
+          <rect x="150.238" y="154.392" width="3.5" height="18" rx="1" transform="rotate(-45 150.238 154.392)" fill="#576375"/>
+          <rect x="138.201" y="163.827" width="3.5" height="18" rx="1" transform="rotate(-33.75 138.201 163.827)" fill="#576375"/>
+          <rect x="124.554" y="170.732" width="3.5" height="18" rx="1" transform="rotate(-22.5 124.554 170.732)" fill="#576375"/>
+          <rect x="109.822" y="174.843" width="3.5" height="18" rx="1" transform="rotate(-11.25 109.822 174.843)" fill="#576375"/>
+          <rect x="94.5711" y="176" width="3.5" height="18" rx="1" fill="#576375"/>
+          <rect x="79.3877" y="174.16" width="3.5" height="18" rx="1" transform="rotate(11.25 79.3877 174.16)" fill="#576375"/>
+          <rect x="64.855" y="169.393" width="3.5" height="18" rx="1" transform="rotate(22.5 64.855 169.393)" fill="#576375"/>
+          <rect x="51.5316" y="161.882" width="3.5" height="18" rx="1" transform="rotate(33.75 51.5316 161.882)" fill="#576375"/>
+          <rect x="39.9293" y="151.917" width="3.5" height="18" rx="1" transform="rotate(45 39.9293 151.917)" fill="#576375"/>
+          <rect x="30.4942" y="139.879" width="3.5" height="18" rx="1" transform="rotate(56.25 30.4942 139.879)" fill="#576375"/>
+          <rect x="23.5888" y="126.233" width="3.5" height="18" rx="1" transform="rotate(67.5 23.5888 126.233)" fill="#576375"/>
+          <rect x="19.4785" y="111.501" width="3.5" height="18" rx="1" transform="rotate(78.75 19.4785 111.501)" fill="#576375"/>
+          <rect x="18.3211" y="96.25" width="3.5" height="18" rx="1" transform="rotate(90 18.3211 96.25)" fill="#576375"/>
+          <rect x="20.1613" y="81.0666" width="3.5" height="18" rx="1" transform="rotate(101.25 20.1613 81.0666)" fill="#576375"/>
+          <rect x="24.9282" y="66.5339" width="3.5" height="18" rx="1" transform="rotate(112.5 24.9282 66.5339)" fill="#576375"/>
+          <rect x="32.4387" y="53.2104" width="3.5" height="18" rx="1" transform="rotate(123.75 32.4387 53.2104)" fill="#576375"/>
+          <rect x="42.4042" y="41.6082" width="3.5" height="18" rx="1" transform="rotate(135 42.4042 41.6082)" fill="#576375"/>
+          <rect x="54.4417" y="32.1731" width="3.5" height="18" rx="1" transform="rotate(146.25 54.4417 32.1731)" fill="#576375"/>
+          <rect x="68.0886" y="25.2677" width="3.5" height="18" rx="1" transform="rotate(157.5 68.0886 25.2677)" fill="#576375"/>
+          <rect x="82.8204" y="21.1573" width="3.5" height="18" rx="1" transform="rotate(168.75 82.8204 21.1573)" fill="#576375"/>
+        </svg>
+        <span class="metric-label">Battery</span>
+        <span class="metric-value" id="battery-value">75%</span>
+      </section>
+      <!-- Temperature placeholder; motorTempC is expected in degrees Celsius. -->
+      <section class="metric metric-motor-temp" aria-label="Motor temperature">
+        <span class="metric-label">Motor Temp</span>
+        <span class="metric-value"><span id="motor-temp-value">00.0</span> °C</span>
+      </section>
+    </main>
+    <script>
+      // Resolve static gauge SVG artwork once; subsequent updates only change its fills.
+      const rpmGauge = document.querySelector(".metric-rpm");
+      const rpmReadout = document.querySelector("#rpm-value");
+      const rpmSegments = Array.from(
+        document.querySelectorAll(".rpm-segments rect")
+      );
+      const redlineRPM = Number(rpmGauge.dataset.redlineRpm);
+      const activeColors = {
+        "#576375": "#39c981",
+        "#9E7D2E": "#ffd34e",
+        "#9E403D": "#ff554f",
+      };
+
+      if (!Number.isFinite(redlineRPM) || redlineRPM <= 0) {
+        throw new RangeError("The RPM gauge redline must be a positive number.");
+      }
+
+      if (rpmSegments.length === 0) {
+        throw new Error("The RPM gauge has no SVG segments to update.");
+      }
+
+      const segmentBaseColors = rpmSegments.map((segment) => {
+        const color = segment.getAttribute("fill");
+        if (!color || !activeColors[color]) {
+          throw new Error(`Unsupported base color on RPM segment: ${color}`);
+        }
+        return color;
+      });
+
+      /*
+       * Single-value RPM API. The gauge uses a 12,000 RPM redline from the
+       * data-redline-rpm attribute; change that HTML value to match the car.
+       * The number passed here must already be decoded and scaled to RPM.
+       */
+      window.setDashboardRPM = (rpm) => {
+        if (typeof rpm !== "number" || !Number.isFinite(rpm) || rpm < 0) {
+          throw new RangeError("RPM must be a finite, non-negative number.");
+        }
+
+        const gaugeProgress = Math.min(rpm / redlineRPM, 1);
+        const activeSegmentCount = Math.floor(gaugeProgress * rpmSegments.length);
+
+        rpmSegments.forEach((segment, index) => {
+          const baseColor = segmentBaseColors[index];
+          segment.setAttribute(
+            "fill",
+            index < activeSegmentCount ? activeColors[baseColor] : baseColor
+          );
+        });
+
+        rpmReadout.textContent = `${rpm.toFixed(1)} rpm`;
+        rpmGauge.setAttribute(
+          "aria-label",
+          `Engine speed: ${Math.round(rpm)} RPM`
+        );
+      };
+
+      // Optional legacy/single-signal bridge; prefer the combined telemetry event below.
+      window.addEventListener("can-rpm", (event) => {
+        if (typeof event.detail?.rpm !== "number") {
+          throw new TypeError('The "can-rpm" event must contain a numeric detail.rpm.');
+        }
+        window.setDashboardRPM(event.detail.rpm);
+      });
+
+      const batteryGauge = document.querySelector(".metric-battery");
+      const batteryReadout = document.querySelector("#battery-value");
+      const batterySegments = Array.from(
+        document.querySelectorAll(".battery-segments rect")
+      );
+      // Thresholds are HTML data attributes so warning behavior can be tuned per vehicle.
+      const lowBatteryThreshold = Number(batteryGauge.dataset.lowThreshold);
+      const mediumBatteryThreshold = Number(batteryGauge.dataset.mediumThreshold);
+      const batteryColors = {
+        low: "#FF401A",
+        medium: "#FFCC0D",
+        high: "#26FF33",
+        inactive: "#576375",
+      };
+
+      if (batterySegments.length === 0) {
+        throw new Error("The battery gauge has no SVG segments to update.");
+      }
+
+      if (
+        !Number.isFinite(lowBatteryThreshold) ||
+        !Number.isFinite(mediumBatteryThreshold) ||
+        lowBatteryThreshold < 0 ||
+        mediumBatteryThreshold <= lowBatteryThreshold ||
+        mediumBatteryThreshold > 100
+      ) {
+        throw new RangeError("Battery warning thresholds must be ordered values from 0 to 100.");
+      }
+
+      window.setDashboardBattery = (percentage) => {
+        if (
+          typeof percentage !== "number" ||
+          !Number.isFinite(percentage) ||
+          percentage < 0 ||
+          percentage > 100
+        ) {
+          throw new RangeError("Battery charge must be a number from 0 to 100.");
+        }
+
+        const activeSegmentCount = Math.round(
+          (percentage / 100) * batterySegments.length
+        );
+        const activeColor =
+          percentage <= lowBatteryThreshold
+            ? batteryColors.low
+            : percentage <= mediumBatteryThreshold
+              ? batteryColors.medium
+              : batteryColors.high;
+
+        batterySegments.forEach((segment, index) => {
+          segment.setAttribute(
+            "fill",
+            index < activeSegmentCount ? activeColor : batteryColors.inactive
+          );
+        });
+
+        batteryReadout.textContent = `${Math.round(percentage)}%`;
+        batteryGauge.setAttribute(
+          "aria-label",
+          `Battery charge: ${Math.round(percentage)} percent`
+        );
+      };
+
+      // Optional legacy/single-signal bridge; charge must be a percentage from 0 to 100.
+      window.addEventListener("can-battery", (event) => {
+        if (typeof event.detail?.percentage !== "number") {
+          throw new TypeError('The "can-battery" event must contain a numeric detail.percentage.');
+        }
+        window.setDashboardBattery(event.detail.percentage);
+      });
+
+      // Color the initial 75% placeholder using the same logic as incoming readings.
+      window.setDashboardBattery(Number(batteryReadout.textContent.replace("%", "")));
+
+      // Text-only metric mappings for readings that do not use segmented SVG gauges.
+      const defaultTelemetryFields = {
+        speedKph: {
+          element: document.querySelector("#speed-value"),
+          digits: 1,
+          minimum: 0,
+        },
+        torquePercent: {
+          element: document.querySelector("#torque-value"),
+          digits: 0,
+          minimum: 0,
+          maximum: 100,
+        },
+        motorTempC: {
+          element: document.querySelector("#motor-temp-value"),
+          digits: 1,
+        },
+      };
+
+      /*
+       * Raspberry Pi / CAN handoff for this screen:
+       * The Pi backend must decode CAN frames, then pass decoded values to this page.
+       * Call updateDefaultTelemetry({ rpm, batteryPercent, speedKph,
+       * torquePercent, motorTempC }); keys are optional so partial CAN packets work.
+       * This HTML does not open a CAN interface or connect to a Pi service by itself.
+       */
+      window.updateDefaultTelemetry = (readings) => {
+        if (!readings || typeof readings !== "object" || Array.isArray(readings)) {
+          throw new TypeError("Default dashboard telemetry must be an object.");
+        }
+
+        const updates = Object.entries(readings);
+        const supportedFields = new Set([
+          "rpm",
+          "batteryPercent",
+          ...Object.keys(defaultTelemetryFields),
+        ]);
+
+        for (const [key, value] of updates) {
+          if (!supportedFields.has(key)) {
+            throw new RangeError(`Unknown default dashboard telemetry field: ${key}`);
+          }
+          if (typeof value !== "number" || !Number.isFinite(value)) {
+            throw new TypeError(`Telemetry value "${key}" must be a finite number.`);
+          }
+          if (key === "rpm" && value < 0) {
+            throw new RangeError("RPM must be a non-negative number.");
+          }
+          if (key === "batteryPercent" && (value < 0 || value > 100)) {
+            throw new RangeError("Battery charge must be a number from 0 to 100.");
+          }
+
+          const field = defaultTelemetryFields[key];
+          if (
+            field &&
+            (value < (field.minimum ?? Number.NEGATIVE_INFINITY) ||
+              value > (field.maximum ?? Number.POSITIVE_INFINITY))
+          ) {
+            throw new RangeError(`Telemetry value "${key}" is outside its supported range.`);
+          }
+        }
+
+        for (const [key, value] of updates) {
+          if (key === "rpm") {
+            window.setDashboardRPM(value);
+          } else if (key === "batteryPercent") {
+            window.setDashboardBattery(value);
+          } else {
+            const field = defaultTelemetryFields[key];
+            field.element.textContent = value.toFixed(field.digits);
+          }
+        }
+      };
+
+      /*
+       * CAN bridge entry point:
+       * A Pi-backed WebSocket or local service can dispatch
+       * new CustomEvent("can-telemetry", { detail: decodedReadings }) on this window.
+       * decodedReadings should use the keys documented above and numeric engineering
+       * values (for example speedKph in km/h and motorTempC in degrees Celsius).
+       */
+      window.addEventListener("can-telemetry", (event) => {
+        window.updateDefaultTelemetry(event.detail);
+      });
+
+      // Driver choice is tab-scoped; reject stale or malformed stored values.
+      const menuToggle = document.querySelector("#menu-toggle");
+      const menuPanel = document.querySelector("#menu-panel");
+      const currentDriver = document.querySelector("#current-driver");
+
+      try {
+        const selectedDriver = sessionStorage.getItem("fs-selected-driver");
+        if (selectedDriver && /^Driver [1-6]$/.test(selectedDriver)) {
+          currentDriver.textContent = selectedDriver;
+        }
+      } catch (error) {
+        console.error("Could not read the driver selection for this session.", error);
+      }
+
+      menuToggle.addEventListener("click", () => {
+        const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+        menuToggle.setAttribute("aria-expanded", String(!isExpanded));
+        menuPanel.hidden = isExpanded;
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".dashboard-menu")) {
+          menuToggle.setAttribute("aria-expanded", "false");
+          menuPanel.hidden = true;
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          menuToggle.setAttribute("aria-expanded", "false");
+          menuPanel.hidden = true;
+          menuToggle.focus();
+        }
+      });
+
+      menuPanel.addEventListener("click", (event) => {
+        const item = event.target.closest("[data-menu-action]");
+        if (item) {
+          document.dispatchEvent(
+            new CustomEvent("dashboard-menu-action", {
+              detail: { action: item.dataset.menuAction },
+            })
+          );
+        }
+      });
+    </script>
+  </body>
+</html>
