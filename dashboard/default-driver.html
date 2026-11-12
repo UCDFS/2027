@@ -11,65 +11,35 @@
       href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="dashboard-common.css" />
     <style>
-      /* Use predictable sizing throughout the fixed 800x480 dashboard canvas. */
-      * {
-        box-sizing: border-box;
-      }
-
-      /* Fill the viewport before centering the dashboard canvas. */
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-      }
-
-      body {
-        display: grid;
-        min-height: 100vh;
-        place-items: center;
-        background: #07131f;
-      }
-
       /* Main driver display; the dark overlay matches the other dashboard pages. */
       .dashboard-screen {
-        position: relative;
-        width: 800px;
-        height: 480px;
-        background:
-          linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
+        position: relative; width: 800px; height: 480px;
+        background: linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
           url("dashBg.jpg") lightgray 50% / cover no-repeat;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
+        border: 1px solid rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
       }
 
       /* Navigation dropdown shared by the dashboard pages. */
       .dashboard-menu {
-        position: absolute;
-        top: 10px;
-        right: 16px;
-        z-index: 3;
-        font-family: Arial, Helvetica, sans-serif;
+        position: absolute; top: 10px; right: 16px; z-index: 3; font-family: Arial, Helvetica, sans-serif;
       }
 
       .menu-toggle {
-        display: flex;
-        width: 124px;
-        height: 36px;
-        padding: 8px 12px;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        border: 0;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.902);
-        color: #0b1220;
-        font: 600 13px/1 Arial, Helvetica, sans-serif;
+        display: flex; width: 124px; height: 36px; padding: 8px 12px; align-items: center;
+        justify-content: center; gap: 10px; border: 0; border-radius: 10px;
+        background: rgba(255, 255, 255, 0.902); color: #0b1220; font: 600 13px/1 "Josefin Slab", Georgia, serif;
         cursor: pointer;
       }
 
@@ -79,25 +49,16 @@
 
       .menu-toggle:focus-visible,
       .menu-item:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 3px;
+        outline: 2px solid #fff; outline-offset: 3px;
       }
 
       .menu-icon {
-        width: 16px;
-        height: 16px;
-        flex: 0 0 16px;
+        width: 16px; height: 16px; flex: 0 0 16px;
       }
 
       .menu-panel {
-        position: absolute;
-        top: 44px;
-        right: 0;
-        width: 224px;
-        padding: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
-        background: rgba(11, 18, 32, 0.96);
+        position: absolute; top: 44px; right: 0; width: 224px; padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; background: rgba(11, 18, 32, 0.96);
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
       }
 
@@ -106,17 +67,9 @@
       }
 
       .menu-item {
-        display: block;
-        width: 100%;
-        padding: 10px 12px;
-        border: 0;
-        border-radius: 6px;
-        background: transparent;
-        color: rgba(255, 255, 255, 0.9);
-        text-align: left;
-        text-decoration: none;
-        font: 14px/1.3 Arial, Helvetica, sans-serif;
-        cursor: pointer;
+        display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 6px; background: transparent;
+        color: rgba(255, 255, 255, 0.9); text-align: left; text-decoration: none;
+        font: 14px/1.3 Arial, Helvetica, sans-serif; cursor: pointer;
       }
 
       .menu-item:hover,
@@ -126,105 +79,54 @@
 
       /* Driver identity label and name in the upper-left corner. */
       .driver-identity {
-        position: absolute;
-        top: 24px;
-        left: 48px;
-        display: flex;
-        width: 220px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        font-family: "Rajdhani", sans-serif;
-        text-align: center;
+        position: absolute; top: 24px; left: 48px; display: flex; width: 220px; flex-direction: column;
+        align-items: stretch; gap: 12px; font-family: "Rajdhani", sans-serif; text-align: center;
         text-transform: uppercase;
       }
 
       .driver-label {
-        align-self: stretch;
-        color: #6b7280;
-        font-size: 13px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-        letter-spacing: 1.2px;
+        align-self: stretch; color: #6b7280; font-size: 13px; font-style: normal; font-weight: 600;
+        line-height: normal; letter-spacing: 1.2px;
       }
 
       .driver-name {
-        align-self: stretch;
-        color: #fff;
-        font-size: 40px;
-        font-style: normal;
-        font-weight: 700;
+        align-self: stretch; color: #fff; font-size: 40px; font-style: normal; font-weight: 700;
         line-height: normal;
       }
 
       /* Shared circle layout and soft white backing for the metric gauges. */
       .metric {
-        position: absolute;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        color: #141925;
-        font-family: "Josefin Slab", Georgia, serif;
-        text-align: center;
+        position: absolute; z-index: 1; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; border-radius: 50%; color: #141925;
+        font-family: "Josefin Slab", Georgia, serif; text-align: center;
       }
 
       .metric::before {
-        position: absolute;
-        z-index: -1;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.90);
-        content: "";
-        filter: blur(4px);
-        inset: 4px;
+        position: absolute; z-index: -1; border-radius: 50%; background: rgba(255, 255, 255, 0.90); content: "";
+        filter: blur(4px); inset: 4px;
       }
 
       .rpm-segments {
-        position: absolute;
-        z-index: 0;
-        top: -22px;
-        left: -22px;
-        width: 184px;
-        height: 184px;
-        overflow: visible;
+        position: absolute; z-index: 0; top: -22px; left: -22px; width: 184px; height: 184px; overflow: visible;
       }
 
       .metric-label {
-        position: relative;
-        z-index: 1;
-        color: #697180;
-        font-size: 15px;
-        font-weight: 400;
-        letter-spacing: 0.7px;
-        text-transform: uppercase;
+        position: relative; z-index: 1; color: #697180; font-size: 15px; font-weight: 400;
+        letter-spacing: 0.7px; text-transform: uppercase;
       }
 
       .metric-value {
-        position: relative;
-        z-index: 1;
-        margin-top: 6px;
-        font-size: 28px;
-        font-weight: 600;
-        line-height: 1;
+        position: relative; z-index: 1; margin-top: 6px; font-size: 28px; font-weight: 600; line-height: 1;
       }
 
       /* RPM gauge: 140px face with the 184px SVG segment ring. */
       .metric-rpm {
-        top: 35.6%;
-        left: 9.5%;
-        width: 140px;
-        height: 140px;
+        top: 35.6%; left: 9.5%; width: 140px; height: 140px;
       }
 
       /* Large center speed readout and its unit. */
       .metric-speed {
-        top: 24.6%;
-        left: 33.25%;
-        width: 240px;
-        height: 240px;
+        top: 24.6%; left: 33.25%; width: 240px; height: 240px;
       }
 
       .metric-speed .metric-label {
@@ -232,29 +134,21 @@
       }
 
       .metric-speed .metric-value {
-        font-size: 72px;
-        font-weight: 700;
+        font-size: 72px; font-weight: 700;
       }
 
       .metric-speed .metric-unit {
-        font-size: 54px;
-        font-weight: 700;
+        font-size: 54px; font-weight: 700;
       }
 
       /* Smaller torque gauge above the main speed display. */
       .metric-torque {
-        top: 2.3%;
-        left: 61.25%;
-        width: 140px;
-        height: 140px;
+        top: 2.3%; left: 61.25%; width: 140px; height: 140px;
       }
 
       /* Battery gauge face and its independently positioned segment ring. */
       .metric-battery {
-        top: 30%;
-        left: 72.75%;
-        width: 200px;
-        height: 200px;
+        top: 30%; left: 72.75%; width: 200px; height: 200px;
       }
 
       .metric-battery::before {
@@ -262,53 +156,33 @@
       }
 
       .battery-segments {
-        position: absolute;
-        z-index: 0;
-        top: 4px;
-        left: 4px;
-        width: 192px;
-        height: 192px;
-        overflow: visible;
+        position: absolute; z-index: 0; top: 4px; left: 4px; width: 192px; height: 192px; overflow: visible;
       }
 
       /* Motor temperature gauge in the lower-right area. */
       .metric-motor-temp {
-        top: 68.7%;
-        left: 60.1%;
-        width: 140px;
-        height: 140px;
+        top: 68.7%; left: 60.1%; width: 140px; height: 140px;
       }
 
       /* Decorative Formula Student logo in the lower-left of the canvas. */
       .fs-logo {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 184px;
-        height: 149px;
+        position: absolute; bottom: 0; left: 0; width: 184px; height: 149px;
         background: url("fslogo-transparent.png") transparent -16.534px -92.178px / 115.052% 161.864% no-repeat;
-        opacity: 0.45;
-        mix-blend-mode: screen;
-        filter: blur(1px);
+        opacity: 0.45; mix-blend-mode: screen; filter: blur(1px);
       }
 
       /* Preserve relative gauge placement while scaling the dashboard responsively. */
       @media (max-width: 860px) {
         .dashboard-screen {
-          width: min(90vw, 800px);
-          height: min(60vw, 480px);
+          width: min(90vw, 800px); height: min(60vw, 480px);
         }
 
         .dashboard-menu {
-          top: 8px;
-          right: 8px;
+          top: 8px; right: 8px;
         }
 
         .driver-identity {
-          top: 5%;
-          left: 5%;
-          width: 27.5%;
-          gap: 2.5vw;
+          top: 5%; left: 5%; width: 27.5%; gap: 2.5vw;
         }
 
         .driver-name {
@@ -318,13 +192,11 @@
         .metric-rpm,
         .metric-torque,
         .metric-motor-temp {
-          width: 17.5%;
-          height: 29.17%;
+          width: 17.5%; height: 29.17%;
         }
 
         .metric-battery {
-          width: 25%;
-          height: 41.67%;
+          width: 25%; height: 41.67%;
         }
 
         .metric-battery::before {
@@ -332,15 +204,11 @@
         }
 
         .battery-segments {
-          top: 2%;
-          left: 2%;
-          width: 96%;
-          height: 96%;
+          top: 2%; left: 2%; width: 96%; height: 96%;
         }
 
         .metric-speed {
-          width: 30%;
-          height: 50%;
+          width: 30%; height: 50%;
         }
 
         .metric-value {
@@ -364,10 +232,7 @@
         }
 
         .fs-logo {
-          width: 23%;
-          height: 31%;
-          background-position: -9% -62%;
-          background-size: 115.052% 161.864%;
+          width: 23%; height: 31%; background-position: -9% -62%; background-size: 115.052% 161.864%;
         }
       }
     </style>
@@ -402,8 +267,11 @@
           <a class="menu-item" href="dash.html">Driver selection</a>
           <a class="menu-item" href="default-driver.html" aria-current="page">Default driver dash</a>
           <a class="menu-item" href="mech-telemetry.html">Mechanical telemetry</a>
-          <button class="menu-item" type="button" data-menu-action="event-one">Event 1</button>
-          <button class="menu-item" type="button" data-menu-action="event-two">Event 2</button>
+          <a class="menu-item" id="personal-bests-link" href="personal-bests.html" hidden>Personal bests</a>
+          <a class="menu-item" href="event-dashboard.html?event=acceleration">Acceleration</a>
+          <a class="menu-item" href="event-dashboard.html?event=skid-pad">Skid Pad</a>
+          <a class="menu-item" href="sprint-dashboard.html">Sprint</a>
+          <a class="menu-item" href="endurance-dashboard.html">Endurance</a>
         </nav>
       </div>
       <!-- RPM face and static SVG ticks; script recolors ticks as RPM changes. -->
@@ -509,6 +377,7 @@
         <span class="metric-value"><span id="motor-temp-value">00.0</span> °C</span>
       </section>
     </main>
+    <script src="dashboard-common.js"></script>
     <script>
       // Resolve static gauge SVG artwork once; subsequent updates only change its fills.
       const rpmGauge = document.querySelector(".metric-rpm");
@@ -734,51 +603,14 @@
         window.updateDefaultTelemetry(event.detail);
       });
 
-      // Driver choice is tab-scoped; reject stale or malformed stored values.
-      const menuToggle = document.querySelector("#menu-toggle");
-      const menuPanel = document.querySelector("#menu-panel");
-      const currentDriver = document.querySelector("#current-driver");
-
-      try {
-        const selectedDriver = sessionStorage.getItem("fs-selected-driver");
-        if (selectedDriver && /^Driver [1-6]$/.test(selectedDriver)) {
-          currentDriver.textContent = selectedDriver;
-        }
-      } catch (error) {
-        console.error("Could not read the driver selection for this session.", error);
-      }
-
-      menuToggle.addEventListener("click", () => {
-        const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
-        menuToggle.setAttribute("aria-expanded", String(!isExpanded));
-        menuPanel.hidden = isExpanded;
-      });
-
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest(".dashboard-menu")) {
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuPanel.hidden = true;
-        }
-      });
-
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuPanel.hidden = true;
-          menuToggle.focus();
-        }
-      });
-
-      menuPanel.addEventListener("click", (event) => {
-        const item = event.target.closest("[data-menu-action]");
-        if (item) {
-          document.dispatchEvent(
-            new CustomEvent("dashboard-menu-action", {
-              detail: { action: item.dataset.menuAction },
-            })
-          );
-        }
-      });
+      DashboardCommon.showSelectedDriver(
+        "#current-driver",
+        "this session",
+        "Default",
+        new URLSearchParams(window.location.search).get("driver") === "default",
+        "Default",
+      );
+      DashboardCommon.initMenu();
     </script>
   </body>
 </html>

@@ -11,129 +11,62 @@
       href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="dashboard-common.css" />
     <style>
-      /* Consistent box sizing makes Figma-based dimensions predictable. */
-      * {
-        box-sizing: border-box;
-      }
-
-      /* Fill the viewport before centering the dashboard canvas. */
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-      }
-
-      body {
-        display: grid;
-        min-height: 100vh;
-        place-items: center;
-        background: #07131f;
-      }
-
       /* Fixed 800x480 canvas with the shared background and 80% navy scrim. */
       .dashboard-screen {
-        position: relative;
-        width: 800px;
-        height: 480px;
-        overflow: hidden;
-        background:
-          linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
+        position: relative; width: 800px; height: 480px; overflow: hidden;
+        background: linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
           url("dashBg.jpg") lightgray 50% / cover no-repeat;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
+        border: 1px solid rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
       }
 
       /* Low-opacity, centered FS artwork behind all telemetry cards. */
       .fs-logo {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 360px;
-        height: 314px;
-        transform: translate(-50%, -50%);
+        position: absolute; top: 50%; left: 50%; width: 360px; height: 314px; transform: translate(-50%, -50%);
         background: url("fslogo-transparent.png") transparent -32.349px -194.254px / 115.052% 161.864% no-repeat;
-        opacity: 0.25;
-        mix-blend-mode: screen;
-        filter: blur(1px);
+        opacity: 0.25; mix-blend-mode: screen; filter: blur(1px);
       }
 
       /* Page title, live/placeholder state indicator, and menu position. */
       .telemetry-header {
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        display: flex;
-        height: 44px;
-        align-items: center;
-        padding: 0 18px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        color: #aab5c8;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 12px;
-        letter-spacing: 1.5px;
+        position: absolute; top: 0; right: 0; left: 0; display: flex; height: 44px; align-items: center;
+        padding: 0 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); color: #aab5c8;
+        font-family: "Josefin Slab", Georgia, serif; font-size: 12px; letter-spacing: 1.5px;
         text-transform: uppercase;
       }
 
       .telemetry-title {
-        display: flex;
-        align-items: center;
-        gap: 9px;
+        display: flex; align-items: center; gap: 9px;
       }
 
       .telemetry-icon {
-        width: 16px;
-        height: 16px;
+        width: 16px; height: 16px;
       }
 
       .telemetry-status {
-        margin-left: auto;
-        margin-right: 120px;
-        color: #aab5c8;
-        font-size: 10px;
-        letter-spacing: 1.2px;
+        margin-left: auto; margin-right: 120px; color: #aab5c8; font-size: 10px; letter-spacing: 1.2px;
         white-space: nowrap;
       }
 
       .status-dot {
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        margin-right: 6px;
-        border-radius: 50%;
-        background: #8993a6;
-        vertical-align: 1px;
+        display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%;
+        background: #8993a6; vertical-align: 1px;
       }
 
       .status-dot.is-live {
-        background: #26ff33;
-        box-shadow: 0 0 7px rgba(38, 255, 51, 0.65);
+        background: #26ff33; box-shadow: 0 0 7px rgba(38, 255, 51, 0.65);
       }
 
       /* Navigation menu controls and dropdown. */
       .dashboard-menu {
-        position: absolute;
-        top: 8px;
-        right: 16px;
-        z-index: 4;
-        font-family: Arial, Helvetica, sans-serif;
+        position: absolute; top: 8px; right: 16px; z-index: 4; font-family: Arial, Helvetica, sans-serif;
       }
 
       .menu-toggle {
-        display: flex;
-        width: 96px;
-        height: 36px;
-        padding: 8px 12px;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        border: 0;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.902);
-        color: #0b1220;
-        font: 600 13px/1 "Josefin Slab", Georgia, serif;
+        display: flex; width: 96px; height: 36px; padding: 8px 12px; align-items: center;
+        justify-content: center; gap: 10px; border: 0; border-radius: 10px;
+        background: rgba(255, 255, 255, 0.902); color: #0b1220; font: 600 13px/1 "Josefin Slab", Georgia, serif;
         cursor: pointer;
       }
 
@@ -143,25 +76,16 @@
 
       .menu-toggle:focus-visible,
       .menu-item:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 3px;
+        outline: 2px solid #fff; outline-offset: 3px;
       }
 
       .menu-icon {
-        width: 16px;
-        height: 16px;
-        flex: 0 0 16px;
+        width: 16px; height: 16px; flex: 0 0 16px;
       }
 
       .menu-panel {
-        position: absolute;
-        top: 44px;
-        right: 0;
-        width: 224px;
-        padding: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
-        background: rgba(11, 18, 32, 0.97);
+        position: absolute; top: 44px; right: 0; width: 224px; padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; background: rgba(11, 18, 32, 0.97);
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
       }
 
@@ -170,17 +94,9 @@
       }
 
       .menu-item {
-        display: block;
-        width: 100%;
-        padding: 10px 12px;
-        border: 0;
-        border-radius: 6px;
-        background: transparent;
-        color: rgba(255, 255, 255, 0.9);
-        text-align: left;
-        text-decoration: none;
-        font: 14px/1.3 Arial, Helvetica, sans-serif;
-        cursor: pointer;
+        display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 6px; background: transparent;
+        color: rgba(255, 255, 255, 0.9); text-align: left; text-decoration: none;
+        font: 14px/1.3 Arial, Helvetica, sans-serif; cursor: pointer;
       }
 
       .menu-item:hover,
@@ -190,32 +106,19 @@
 
       /* Four high-level telemetry readings across the top of the canvas. */
       .summary-grid {
-        position: absolute;
-        top: 58px;
-        right: 18px;
-        left: 18px;
-        display: grid;
-        height: 96px;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
+        position: absolute; top: 58px; right: 18px; left: 18px; display: grid; height: 96px;
+        grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;
       }
 
       /* Shared translucent card surface for all measurements. */
       .telemetry-card {
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 13px;
-        background: rgba(255, 255, 255, 0.055);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.015);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 13px;
+        background: rgba(255, 255, 255, 0.055); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.015);
+        -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       }
 
       .summary-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 3px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
       }
 
       .summary-card:nth-child(2),
@@ -233,99 +136,55 @@
 
       /* Labels use the requested blue-gray uppercase typography. */
       .metric-label {
-        color: #adc4e0;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 12px;
-        font-style: normal;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-align: center;
-        text-transform: uppercase;
+        color: #adc4e0; font-family: "Josefin Slab", Georgia, serif; font-size: 12px; font-style: normal;
+        font-weight: 600; letter-spacing: 2px; text-align: center; text-transform: uppercase;
         line-height: normal;
       }
 
       /* Numeric measurements use the large, high-contrast display style. */
       .metric-reading {
-        color: #f1f5f9;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 40px;
-        font-style: normal;
-        font-weight: 700;
-        line-height: normal;
-        white-space: nowrap;
+        color: #f1f5f9; font-family: "Josefin Slab", Georgia, serif; font-size: 40px; font-style: normal;
+        font-weight: 700; line-height: normal; white-space: nowrap;
       }
 
       .metric-unit {
-        margin-left: 3px;
-        color: #c3cada;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 12px;
+        margin-left: 3px; color: #c3cada; font-family: "Josefin Slab", Georgia, serif; font-size: 12px;
         font-weight: 400;
       }
 
       /* Lower area: car-style suspension display at left and brake values at right. */
       .lower-grid {
-        position: absolute;
-        top: 170px;
-        right: 18px;
-        bottom: 18px;
-        left: 18px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        position: absolute; top: 170px; right: 18px; bottom: 18px; left: 18px; display: grid;
+        grid-template-columns: 1fr 1fr; gap: 16px;
       }
 
       .suspension-panel {
-        display: flex;
-        min-width: 0;
-        flex-direction: column;
-        gap: 10px;
+        display: flex; min-width: 0; flex-direction: column; gap: 10px;
       }
 
       .section-title {
-        margin: 0 0 0 76px;
-        color: #aeb8ca;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 12px;
-        font-weight: 400;
-        letter-spacing: 1.5px;
-        line-height: 18px;
-        text-transform: uppercase;
+        margin: 0 0 0 76px; color: #aeb8ca; font-family: "Josefin Slab", Georgia, serif; font-size: 12px;
+        font-weight: 400; letter-spacing: 1.5px; line-height: 18px; text-transform: uppercase;
       }
 
       /* Four cards arranged around the centered vehicle/axle diagram. */
       .suspension-grid {
-        position: relative;
-        display: grid;
-        width: 100%;
-        height: 250px;
-        flex: 0 0 250px;
-        grid-template-columns: repeat(2, minmax(0, 170px));
-        grid-template-rows: repeat(2, 120px);
-        justify-content: center;
-        align-content: center;
-        column-gap: 32px;
-        row-gap: 10px;
+        position: relative; display: grid; width: 100%; height: 250px; flex: 0 0 250px;
+        grid-template-columns: repeat(2, minmax(0, 170px)); grid-template-rows: repeat(2, 120px);
+        justify-content: center; align-content: center; column-gap: 32px; row-gap: 10px;
       }
 
       /* SVG axle and center lines overlay the suspension cards without blocking them. */
       .suspension-diagram {
-        position: absolute;
-        z-index: 3;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
+        position: absolute; z-index: 3; inset: 0; width: 100%; height: 100%; pointer-events: none;
       }
 
       .suspension-diagram .centerline {
-        stroke: rgba(255, 255, 255, 0.50);
-        stroke-width: 0.5;
+        stroke: rgba(255, 255, 255, 0.50); stroke-width: 0.5;
       }
 
       .suspension-diagram .axle-line {
-        stroke: rgba(255, 255, 255, 0.40);
-        stroke-width: 0.5;
+        stroke: rgba(255, 255, 255, 0.40); stroke-width: 0.5;
       }
 
       .suspension-diagram circle {
@@ -335,28 +194,18 @@
       /* Shared alignment for each suspension and brake measurement card. */
       .suspension-card,
       .brake-card {
-        display: flex;
-        min-width: 0;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center;
         gap: 5px;
       }
 
       .suspension-card {
-        z-index: 2;
-        width: 170px;
-        height: 120px;
-        border-color: rgba(59, 130, 246, 0.1255);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.0392);
-        gap: 2px;
+        z-index: 2; width: 170px; height: 120px; border-color: rgba(59, 130, 246, 0.1255); border-radius: 10px;
+        background: rgba(255, 255, 255, 0.0392); gap: 2px;
       }
 
       .suspension-card .metric-label,
       .suspension-card .metric-reading {
-        position: relative;
-        z-index: 4;
+        position: relative; z-index: 4;
       }
 
       .suspension-card .metric-reading {
@@ -365,53 +214,34 @@
 
       /* Two brake-pressure cards share the lower-right panel. */
       .brake-grid {
-        display: grid;
-        min-width: 0;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
+        display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
       }
 
       .brake-card {
-        padding: 10px;
-        border-color: rgba(224, 120, 71, 0.16);
+        padding: 10px; border-color: rgba(224, 120, 71, 0.16);
       }
 
       .brake-meter {
-        width: 88%;
-        height: 5px;
-        margin-top: 5px;
-        border-radius: 99px;
-        background: rgba(255, 255, 255, 0.10);
+        width: 88%; height: 5px; margin-top: 5px; border-radius: 99px; background: rgba(255, 255, 255, 0.10);
       }
 
       /* Scale grids, logo, and text when the browser is narrower than the canvas. */
       @media (max-width: 860px) {
         .dashboard-screen {
-          width: min(90vw, 800px);
-          height: min(60vw, 480px);
+          width: min(90vw, 800px); height: min(60vw, 480px);
         }
 
         .fs-logo {
-          width: 45%;
-          height: 65.4%;
-          transform: translate(-50%, -50%);
-          background-position: -9% -62%;
+          width: 45%; height: 65.4%; transform: translate(-50%, -50%); background-position: -9% -62%;
           background-size: 115.052% 161.864%;
         }
 
         .summary-grid {
-          right: 2.25%;
-          left: 2.25%;
-          height: 20%;
-          gap: 2%;
+          right: 2.25%; left: 2.25%; height: 20%; gap: 2%;
         }
 
         .lower-grid {
-          top: 35.4%;
-          right: 2.25%;
-          bottom: 3.75%;
-          left: 2.25%;
-          gap: 2%;
+          top: 35.4%; right: 2.25%; bottom: 3.75%; left: 2.25%; gap: 2%;
         }
 
         .brake-grid {
@@ -420,8 +250,7 @@
 
         .metric-label,
         .section-title {
-          font-size: clamp(7px, 1.5vw, 12px);
-          letter-spacing: 0.8px;
+          font-size: clamp(7px, 1.5vw, 12px); letter-spacing: 0.8px;
         }
 
         .metric-reading {
@@ -445,13 +274,11 @@
         }
 
         .telemetry-header {
-          padding: 0 2.25%;
-          font-size: clamp(8px, 1.5vw, 12px);
+          padding: 0 2.25%; font-size: clamp(8px, 1.5vw, 12px);
         }
 
         .telemetry-status {
-          margin-right: 105px;
-          font-size: clamp(6px, 1.25vw, 10px);
+          margin-right: 105px; font-size: clamp(6px, 1.25vw, 10px);
         }
 
         .dashboard-menu {
@@ -459,8 +286,7 @@
         }
 
         .menu-toggle {
-          width: 88px;
-          height: 32px;
+          width: 88px; height: 32px;
         }
       }
     </style>
@@ -505,6 +331,11 @@
           <a class="menu-item" href="dash.html">Driver selection</a>
           <a class="menu-item" href="default-driver.html">Default driver dash</a>
           <a class="menu-item" href="mech-telemetry.html" aria-current="page">Mechanical telemetry</a>
+          <a class="menu-item" id="personal-bests-link" href="personal-bests.html" hidden>Personal bests</a>
+          <a class="menu-item" href="event-dashboard.html?event=acceleration">Acceleration</a>
+          <a class="menu-item" href="event-dashboard.html?event=skid-pad">Skid Pad</a>
+          <a class="menu-item" href="sprint-dashboard.html">Sprint</a>
+          <a class="menu-item" href="endurance-dashboard.html">Endurance</a>
         </nav>
       </div>
       <!-- Four summary metrics are updated by the keyed telemetry map below. -->
@@ -576,6 +407,7 @@
         </div>
       </section>
     </main>
+    <script src="dashboard-common.js"></script>
     <script>
       /*
        * CAN field-to-display map and expected engineering units:
@@ -585,20 +417,12 @@
        * the page API; display formatting here only adds one decimal place.
        */
       const telemetryFields = {
-        dcBusVoltage: { element: document.querySelector("#dc-bus-voltage"), digits: 1 },
-        motorTemp: { element: document.querySelector("#motor-temp"), digits: 1 },
-        inverterTemp: { element: document.querySelector("#inverter-temp"), digits: 1 },
-        steeringAngle: { element: document.querySelector("#steering-angle"), digits: 1 },
-        frontLeft: { element: document.querySelector("#front-left"), digits: 1 },
-        frontRight: { element: document.querySelector("#front-right"), digits: 1 },
-        backLeft: { element: document.querySelector("#back-left"), digits: 1 },
-        backRight: { element: document.querySelector("#back-right"), digits: 1 },
-        frontBrakePressure: { element: document.querySelector("#front-brake-pressure"), digits: 1 },
-        rearBrakePressure: { element: document.querySelector("#rear-brake-pressure"), digits: 1 },
+        dcBusVoltage: ["#dc-bus-voltage", 1], motorTemp: ["#motor-temp", 1],
+        inverterTemp: ["#inverter-temp", 1], steeringAngle: ["#steering-angle", 1],
+        frontLeft: ["#front-left", 1], frontRight: ["#front-right", 1],
+        backLeft: ["#back-left", 1], backRight: ["#back-right", 1],
+        frontBrakePressure: ["#front-brake-pressure", 1], rearBrakePressure: ["#rear-brake-pressure", 1],
       };
-      // Status indicates that at least one valid payload has been applied.
-      const telemetryStatusText = document.querySelector("#status-text");
-      const telemetryStatusDot = document.querySelector("#status-dot");
 
       /*
        * Primary Pi/backend handoff. Pass a partial object using the keys above,
@@ -607,23 +431,9 @@
        * their previous display value; unknown keys and invalid values throw.
        */
       window.updateMechTelemetry = (readings) => {
-        if (!readings || typeof readings !== "object" || Array.isArray(readings)) {
-          throw new TypeError("Mechanical telemetry readings must be an object.");
-        }
-
-        for (const [key, value] of Object.entries(readings)) {
-          const field = telemetryFields[key];
-          if (!field) {
-            throw new RangeError(`Unknown mechanical telemetry field: ${key}`);
-          }
-          if (typeof value !== "number" || !Number.isFinite(value)) {
-            throw new TypeError(`Telemetry value "${key}" must be a finite number.`);
-          }
-          field.element.textContent = value.toFixed(field.digits);
-        }
-
-        telemetryStatusText.textContent = "Live readings";
-        telemetryStatusDot.classList.add("is-live");
+        DashboardCommon.updateTelemetry(readings, telemetryFields, "Mechanical");
+        document.querySelector("#status-text").textContent = "Live readings";
+        document.querySelector("#status-dot").classList.add("is-live");
       };
 
       /*
@@ -637,29 +447,9 @@
       });
 
       // Menu behavior is local navigation only and is independent of telemetry.
-      const menuToggle = document.querySelector("#menu-toggle");
-      const menuPanel = document.querySelector("#menu-panel");
-
-      menuToggle.addEventListener("click", () => {
-        const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
-        menuToggle.setAttribute("aria-expanded", String(!isExpanded));
-        menuPanel.hidden = isExpanded;
-      });
-
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest(".dashboard-menu")) {
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuPanel.hidden = true;
-        }
-      });
-
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuPanel.hidden = true;
-          menuToggle.focus();
-        }
-      });
+      // Keep Personal Bests hidden for the default dashboard or an invalid selection.
+      DashboardCommon.syncPersonalBestsLink("Personal Bests access");
+      DashboardCommon.initMenu();
     </script>
   </body>
 </html>

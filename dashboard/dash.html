@@ -9,119 +9,60 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="dashboard-common.css" />
     <style>
-      /* Include padding and borders in each element's declared dimensions. */
-      * {
-        box-sizing: border-box;
-      }
-
-      /* Let the dashboard center against the full browser window. */
       html, body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
         font-family: Arial, Helvetica, sans-serif;
-      }
-
-      /* Center the 800x480 dashboard on a dark page background. */
-      body {
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: #07131f;
       }
 
       /* Fixed-size dashboard canvas, with the supplied image darkened by a scrim. */
       .dashboard-scrim {
-        position: relative;
-        display: flex;
-        width: 800px;
-        height: 480px;
-        align-items: center;
+        position: relative; display: flex; width: 800px; height: 480px; align-items: center;
         justify-content: center;
-        background:
-          linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
+        background: linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
           url("dashBg.jpg") lightgray 50% / cover no-repeat;
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
+        border: 1px solid rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
       }
 
       /* Main translucent container for the driver heading and driver choices. */
       .selection-panel {
-        display: flex;
-        width: 720px;
-        height: 400px;
-        padding: 24px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.102);
-        border-radius: 28px;
-        background: rgba(15, 23, 42, 0.60);
-        box-shadow: 0 18px 40px 0 rgba(0, 0, 0, 0.25);
-        -webkit-backdrop-filter: blur(12px);
-        backdrop-filter: blur(12px);
+        display: flex; width: 720px; height: 400px; padding: 24px; flex-direction: column;
+        align-items: flex-start; gap: 20px; border: 1px solid rgba(255, 255, 255, 0.102); border-radius: 28px;
+        background: rgba(15, 23, 42, 0.60); box-shadow: 0 18px 40px 0 rgba(0, 0, 0, 0.25);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
       }
 
       /* Stack the title and its decorative underline at the top of the panel. */
       .selection-header {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        align-self: stretch;
-        gap: 8px;
+        display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 8px;
       }
 
       /* Typography for the "Who's Driving?" heading. */
       .selection-title {
-        margin: 0;
-        color: #fff;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 34px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-        letter-spacing: 0.8px;
+        margin: 0; color: #fff; font-family: "Josefin Slab", Georgia, serif; font-size: 34px;
+        font-style: normal; font-weight: 600; line-height: normal; letter-spacing: 0.8px;
         text-transform: uppercase;
       }
 
       /* Short teal accent line beneath the heading; it needs no extra HTML. */
       .selection-header::after {
-        width: 80px;
-        height: 3px;
-        border-radius: 2px;
-        background: #64d5d3;
-        content: "";
+        width: 80px; height: 3px; border-radius: 2px; background: #64d5d3; content: "";
       }
 
       /* Arrange the six driver buttons in three columns with consistent spacing. */
       .driver-grid {
-        display: grid;
-        width: 100%;
-        grid-template-columns: repeat(3, 216px);
-        gap: 10px;
+        display: grid; width: 100%; grid-template-columns: repeat(3, 216px); gap: 10px;
       }
 
       /* Each driver is a button so it works with mouse, keyboard, and assistive tech. */
       .driver-card {
-        display: flex;
-        width: 216px;
-        height: 110px;
-        padding: 14px;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        border: 1px solid rgba(255, 255, 255, 0.102);
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.0706);
-        color: #ebf5ff;
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-        cursor: pointer;
+        display: flex; width: 216px; height: 110px; padding: 14px; flex-direction: column;
+        justify-content: center; align-items: center; gap: 4px; border: 1px solid rgba(255, 255, 255, 0.102);
+        border-radius: 18px; background: rgba(255, 255, 255, 0.0706); color: #ebf5ff;
+        -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); cursor: pointer;
       }
 
       /* Lighten a card while the pointer is over it. */
@@ -131,53 +72,32 @@
 
       /* Show a visible focus ring when navigating with a keyboard. */
       .driver-card:focus-visible {
-        outline: 2px solid #64d5d3;
-        outline-offset: 3px;
+        outline: 2px solid #64d5d3; outline-offset: 3px;
       }
 
       /* JavaScript sets aria-pressed on the chosen card; this rule shows that state. */
       .driver-card[aria-pressed="true"] {
-        border-color: #64d5d3;
-        background: rgba(100, 213, 211, 0.18);
+        border-color: #64d5d3; background: rgba(100, 213, 211, 0.18);
         box-shadow: inset 0 0 0 1px rgba(100, 213, 211, 0.35);
       }
 
       /* Center each driver label and match the heading's typeface. */
       .driver-name {
-        align-self: stretch;
-        color: #ebf5ff;
-        text-align: center;
-        font-family: "Josefin Slab", Georgia, serif;
-        font-size: 22px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-        letter-spacing: 0.8px;
+        align-self: stretch; color: #ebf5ff; text-align: center; font-family: "Josefin Slab", Georgia, serif;
+        font-size: 22px; font-style: normal; font-weight: 600; line-height: normal; letter-spacing: 0.8px;
         text-transform: uppercase;
       }
 
       /* Position the menu at the top-right of the dashboard canvas. */
       .menu {
-        position: absolute;
-        top: 2px;
-        right: 16px;
-        z-index: 2;
+        position: absolute; top: 2px; right: 16px; z-index: 2;
       }
 
       /* Menu button dimensions and icon/label alignment. */
       .menu-toggle {
-        display: flex;
-        width: 96px;
-        height: 36px;
-        padding: 8px 12px;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        border: 0;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.902);
-        color: #0b1220;
-        font: 600 13px/1 Arial, Helvetica, sans-serif;
+        display: flex; width: 96px; height: 36px; padding: 8px 12px; align-items: center;
+        justify-content: center; gap: 10px; border: 0; border-radius: 10px;
+        background: rgba(255, 255, 255, 0.902); color: #0b1220; font: 600 13px/1 "Josefin Slab", Georgia, serif;
         cursor: pointer;
       }
 
@@ -189,27 +109,18 @@
       /* Keep keyboard focus clear on both the toggle and dropdown options. */
       .menu-toggle:focus-visible,
       .menu-item:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 3px;
+        outline: 2px solid #fff; outline-offset: 3px;
       }
 
       /* Three-line menu symbol drawn as a small inline SVG. */
       .menu-icon {
-        width: 16px;
-        height: 16px;
-        flex: 0 0 16px;
+        width: 16px; height: 16px; flex: 0 0 16px;
       }
 
       /* Dropdown is anchored below the menu button and overlays the dashboard. */
       .menu-panel {
-        position: absolute;
-        top: 44px;
-        right: 0;
-        width: 224px;
-        padding: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
-        background: rgba(11, 18, 32, 0.96);
+        position: absolute; top: 44px; right: 0; width: 224px; padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; background: rgba(11, 18, 32, 0.96);
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
       }
 
@@ -220,17 +131,9 @@
 
       /* Make each menu choice fill the dropdown row and read like a text option. */
       .menu-item {
-        display: block;
-        width: 100%;
-        padding: 10px 12px;
-        border: 0;
-        border-radius: 6px;
-        background: transparent;
-        color: rgba(255, 255, 255, 0.9);
-        text-align: left;
-        text-decoration: none;
-        font: 14px/1.3 Arial, Helvetica, sans-serif;
-        cursor: pointer;
+        display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 6px; background: transparent;
+        color: rgba(255, 255, 255, 0.9); text-align: left; text-decoration: none;
+        font: 14px/1.3 Arial, Helvetica, sans-serif; cursor: pointer;
       }
 
       /* Highlight a dropdown option while the pointer is over it. */
@@ -242,14 +145,11 @@
       /* Adapt the dashboard and driver grid for narrower browser windows. */
       @media (max-width: 860px) {
         .dashboard-scrim {
-          width: min(90vw, 800px);
-          height: min(60vw, 480px);
+          width: min(90vw, 800px); height: min(60vw, 480px);
         }
 
         .selection-panel {
-          width: calc(100% - 32px);
-          height: calc(100% - 64px);
-          padding: 20px;
+          width: calc(100% - 32px); height: calc(100% - 64px); padding: 20px;
         }
 
         .driver-grid {
@@ -261,8 +161,7 @@
         }
 
         .menu {
-          top: 0;
-          right: 12px;
+          top: 0; right: 12px;
         }
 
         .menu-toggle {
@@ -320,86 +219,19 @@
           <span>Menu</span>
         </button>
         <nav class="menu-panel" id="menu-panel" aria-label="Dashboard menu" hidden>
-          <a class="menu-item" href="default-driver.html">Choose default driver</a>
-          <button class="menu-item" type="button" data-menu-action="mechanical-dashboard">Mechanical dash</button>
-          <button class="menu-item" type="button" data-menu-action="event-one">Event 1</button>
-          <button class="menu-item" type="button" data-menu-action="event-two">Event 2</button>
+          <a class="menu-item" href="default-driver.html?driver=default">Choose default driver</a>
+          <a class="menu-item" id="personal-bests-link" href="personal-bests.html" hidden>Personal bests</a>
+          <a class="menu-item" href="mech-telemetry.html">Mechanical dash</a>
+          <a class="menu-item" href="event-dashboard.html?event=acceleration">Acceleration</a>
+          <a class="menu-item" href="event-dashboard.html?event=skid-pad">Skid Pad</a>
+          <a class="menu-item" href="sprint-dashboard.html">Sprint</a>
+          <a class="menu-item" href="endurance-dashboard.html">Endurance</a>
         </nav>
       </div>
     </main>
+    <script src="dashboard-common.js"></script>
     <script>
-      // Cache elements once for the driver selection and menu interactions below.
-      const menuToggle = document.querySelector("#menu-toggle");
-      const menuPanel = document.querySelector("#menu-panel");
-      const driverCards = document.querySelectorAll(".driver-card");
-
-      /*
-       * Selecting a driver highlights its card and stores the name for this tab.
-       * The driver-selected event is only a same-page browser event; navigation
-       * immediately follows it, so it is not a reliable Pi/backend message.
-       * Add backend driver reporting here only after its transport/API is specified.
-       */
-      driverCards.forEach((card) => {
-        card.addEventListener("click", () => {
-          driverCards.forEach((driverCard) => {
-            driverCard.setAttribute("aria-pressed", String(driverCard === card));
-          });
-
-          const selectedDriver = `Driver ${card.dataset.driver}`;
-          try {
-            sessionStorage.setItem("fs-selected-driver", selectedDriver);
-          } catch (error) {
-            console.error("Could not save the selected driver for this session.", error);
-          }
-
-          document.dispatchEvent(
-            new CustomEvent("driver-selected", {
-              detail: {
-                driver: Number(card.dataset.driver),
-                name: selectedDriver,
-              },
-            })
-          );
-
-          window.location.assign("default-driver.html");
-        });
-      });
-
-      // Open or close the dropdown and keep the accessible expanded state in sync.
-      menuToggle.addEventListener("click", () => {
-        const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
-        menuToggle.setAttribute("aria-expanded", String(!isExpanded));
-        menuPanel.hidden = isExpanded;
-      });
-
-      // Clicking anywhere outside the menu closes an open dropdown.
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest(".menu")) {
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuPanel.hidden = true;
-        }
-      });
-
-      // Escape closes the dropdown and returns keyboard focus to its toggle button.
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuPanel.hidden = true;
-          menuToggle.focus();
-        }
-      });
-
-      // Notify any same-page UI listener; this does not send an action to the Pi.
-      menuPanel.addEventListener("click", (event) => {
-        const item = event.target.closest("[data-menu-action]");
-        if (item) {
-          document.dispatchEvent(
-            new CustomEvent("dashboard-menu-action", {
-              detail: { action: item.dataset.menuAction },
-            })
-          );
-        }
-      });
+      DashboardCommon.initDriverSelection();
     </script>
   </body>
 </html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Metadata and dashboard font, consistent with the telemetry pages. -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Bests</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard-common.css" />
+    <style>
+      /* Shared 800x480 background canvas and 80% navy scrim. */
+      .dashboard-screen {
+        position: relative; width: 800px; height: 480px; overflow: hidden;
+        background: linear-gradient(rgba(11, 18, 32, 0.80), rgba(11, 18, 32, 0.80)),
+          url("dashBg.jpg") lightgray 50% / cover no-repeat;
+        border: 1px solid rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(11, 18, 32, 0.30);
+      }
+
+      /* Center FS logo using the supplied crop, dimensions, and visual effects. */
+      .fs-logo {
+        position: absolute; top: 50%; left: 50%; width: 411px; height: 347px; transform: translate(-50%, -50%);
+        background: url("fslogo-transparent.png") transparent -36.932px -214.669px / 115.052% 161.864% no-repeat;
+        opacity: 0.45; mix-blend-mode: screen; filter: blur(1px);
+      }
+
+      /* Main heading is centered near the top of the dashboard canvas. */
+      .page-title {
+        position: absolute; top: 0; left: 50%; display: flex; width: 540px; height: 100px;
+        flex-direction: column; justify-content: center; margin: 0; transform: translateX(-50%); color: #fff;
+        text-align: center; font-family: "Josefin Slab", Georgia, serif; font-size: 48px; font-style: normal;
+        font-weight: 600; line-height: normal;
+      }
+
+      /* Both record cards use the soft white circular treatment from the mockup. */
+      .personal-best {
+        position: absolute; z-index: 1; display: flex; width: 200px; height: 200px; flex-direction: column;
+        align-items: center; justify-content: center; gap: 8px; border-radius: 50%; text-align: center;
+      }
+
+      .personal-best::before {
+        position: absolute; z-index: -1; border-radius: 50%; background: rgba(255, 255, 255, 0.902);
+        content: ""; filter: blur(4px); inset: 0;
+      }
+
+      /* Highest speed recorded for this driver, on the right at mid-height. */
+      .personal-best-speed {
+        top: 150px; right: 8px;
+      }
+
+      /* Best completed lap time, on the left at mid-height. */
+      .personal-best-lap {
+        top: 150px; left: 32px;
+      }
+
+      .record-label {
+        width: 136px; color: #6b7280; text-align: center; font-family: "Josefin Slab", Georgia, serif;
+        font-size: 16px; font-style: normal; font-weight: 600; line-height: normal; letter-spacing: 0.8px;
+        text-transform: uppercase;
+      }
+
+      .record-value {
+        align-self: stretch; color: #111827; text-align: center; font-family: "Josefin Slab", Georgia, serif;
+        font-size: 40px; font-style: normal; font-weight: 700; line-height: normal; white-space: nowrap;
+      }
+
+      .personal-best-lap .record-value {
+        font-size: 32px;
+      }
+
+      .record-unit {
+        font-size: 0.7em;
+      }
+
+      /* Navigation dropdown matches the other dashboard pages. */
+      .dashboard-menu {
+        position: absolute; top: 8px; right: 16px; z-index: 2; font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .menu-toggle {
+        display: flex; width: 96px; height: 36px; padding: 8px 12px; align-items: center;
+        justify-content: center; gap: 10px; border: 0; border-radius: 10px;
+        background: rgba(255, 255, 255, 0.902); color: #0b1220; font: 600 13px/1 "Josefin Slab", Georgia, serif;
+        cursor: pointer;
+      }
+
+      .menu-toggle:hover {
+        background: #fff;
+      }
+
+      .menu-toggle:focus-visible,
+      .menu-item:focus-visible {
+        outline: 2px solid #fff; outline-offset: 3px;
+      }
+
+      .menu-icon {
+        width: 16px; height: 16px; flex: 0 0 16px;
+      }
+
+      .menu-panel {
+        position: absolute; top: 44px; right: 0; width: 224px; padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; background: rgba(11, 18, 32, 0.97);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .menu-panel[hidden] {
+        display: none;
+      }
+
+      .menu-item {
+        display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 6px; background: transparent;
+        color: rgba(255, 255, 255, 0.9); text-align: left; text-decoration: none;
+        font: 14px/1.3 Arial, Helvetica, sans-serif; cursor: pointer;
+      }
+
+      .menu-item:hover,
+      .menu-item[aria-current="page"] {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      @media (max-width: 860px) {
+        .dashboard-screen {
+          width: min(90vw, 800px); height: min(60vw, 480px);
+        }
+
+        .fs-logo {
+          width: 51.375%; height: 72.292%; background-position: -9% -62%; background-size: 115.052% 161.864%;
+        }
+
+        .page-title {
+          top: 0; width: 70%; height: 21%; font-size: clamp(28px, 6vw, 48px);
+        }
+
+        .personal-best {
+          width: 25%; height: 41.667%;
+        }
+
+        .personal-best-speed {
+          top: 31.25%; right: 1%;
+        }
+
+        .personal-best-lap {
+          top: 31.25%; left: 4%;
+        }
+
+        .record-label {
+          width: 90%; font-size: clamp(10px, 2vw, 16px);
+        }
+
+        .record-value {
+          font-size: clamp(18px, 5vw, 40px);
+        }
+
+        .personal-best-lap .record-value {
+          font-size: clamp(14px, 4vw, 32px);
+        }
+
+        .dashboard-menu {
+          top: 2%; right: 2%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- The selected-driver check below protects this page from default access. -->
+    <main class="dashboard-screen" aria-label="Personal bests dashboard">
+      <div class="fs-logo" role="img" aria-label="Formula Student logo"></div>
+      <h1 class="page-title">Personal Bests</h1>
+      <!-- Values are records supplied by the backend, not calculated from this page's session. -->
+      <section class="personal-best personal-best-speed" aria-label="Personal best speed">
+        <span class="record-label">Speed</span>
+        <span class="record-value"><span id="top-speed-value">00.0</span> <span class="record-unit">kph</span></span>
+      </section>
+      <section class="personal-best personal-best-lap" aria-label="Personal best lap time">
+        <span class="record-label">Lap Time</span>
+        <span class="record-value" id="best-lap-time-value">00:000.000</span>
+      </section>
+      <div class="dashboard-menu">
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="menu-panel"
+        >
+          <svg class="menu-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 4h12M2 8h12M2 12h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+          <span>Menu</span>
+        </button>
+        <nav class="menu-panel" id="menu-panel" aria-label="Dashboard menu" hidden>
+          <a class="menu-item" href="dash.html">Driver selection</a>
+          <a class="menu-item" href="default-driver.html">Default driver dash</a>
+          <a class="menu-item" href="mech-telemetry.html">Mechanical telemetry</a>
+          <a class="menu-item" href="personal-bests.html" aria-current="page">Personal bests</a>
+          <a class="menu-item" href="event-dashboard.html?event=acceleration">Acceleration</a>
+          <a class="menu-item" href="event-dashboard.html?event=skid-pad">Skid Pad</a>
+          <a class="menu-item" href="sprint-dashboard.html">Sprint</a>
+          <a class="menu-item" href="endurance-dashboard.html">Endurance</a>
+        </nav>
+      </div>
+    </main>
+    <script src="dashboard-common.js"></script>
+    <script>
+      /*
+       * This page is for an explicitly selected driver, never the default profile.
+       * If session data is absent, invalid, or unavailable, return to driver selection.
+       */
+       if (DashboardCommon.requireSelectedDriver("Personal Bests", "dash.html")) {
+         /*
+         * The Raspberry Pi/CAN logger must maintain the driver's all-time top
+         * speed and best lap, then send these decoded records to this page.
+         * API fields: topSpeedKph (number, km/h) and bestLapTimeMs (number, ms).
+         * Lap display uses MM:SSS.mmm to match the supplied 00:000.000 layout.
+         * This page does not read raw CAN, calculate laps, or persist records.
+         */
+        const topSpeedValue = document.querySelector("#top-speed-value");
+        const bestLapTimeValue = document.querySelector("#best-lap-time-value");
+
+        window.updatePersonalBests = (records) => {
+          if (!records || typeof records !== "object" || Array.isArray(records)) {
+            throw new TypeError("Personal best records must be an object.");
+          }
+
+          const recordEntries = Object.entries(records);
+          if (recordEntries.length === 0) {
+            throw new TypeError("At least one personal best record must be provided.");
+          }
+
+          for (const [key, value] of recordEntries) {
+            if (key !== "topSpeedKph" && key !== "bestLapTimeMs") {
+              throw new RangeError(`Unknown personal best field: ${key}`);
+            }
+            if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+              throw new RangeError(`Personal best "${key}" must be a finite, non-negative number.`);
+            }
+          }
+
+          for (const [key, value] of recordEntries) {
+            if (key === "topSpeedKph") {
+              topSpeedValue.textContent = value.toFixed(1).padStart(4, "0");
+            } else {
+              const totalMilliseconds = Math.round(value);
+              const minutes = Math.floor(totalMilliseconds / 60_000);
+              const seconds = Math.floor((totalMilliseconds % 60_000) / 1_000);
+              const milliseconds = totalMilliseconds % 1_000;
+              bestLapTimeValue.textContent =
+                `${minutes.toString().padStart(2, "0")}:` +
+                `${seconds.toString().padStart(3, "0")}.` +
+                milliseconds.toString().padStart(3, "0");
+            }
+          }
+        };
+
+        // A Pi bridge may dispatch { topSpeedKph, bestLapTimeMs } as event detail.
+        window.addEventListener("personal-bests-update", (event) => {
+          window.updatePersonalBests(event.detail);
+        });
+
+        DashboardCommon.initMenu();
+      }
+    </script>
+  </body>
+</html>
