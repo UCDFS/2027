@@ -9,6 +9,39 @@ The repos for the microcontrollers uses the PlatformIO framework for easy buildi
 
 There is a separate PlatformIO project for each TEENSY: the front node, the rear node, and the central VCU (see architecture above).
 
+## File Structure
+2027/
+│
+├── shared/
+│   └── CANProtocol/
+│       ├── include/
+│       │   ├── CANProtocol.h
+│       │   ├── CANMessageIDs.h
+│       │   ├── CANSignals.h
+│       │
+│       └── src/
+│           ├── CANEncoder.cpp
+│           ├── CANDecoder.cpp
+│           └── CANProtocol.cpp
+│
+├── FrontNode/
+│   ├── platformio.ini
+│   └── src/
+│       └── main.cpp
+│
+├── RearNode/
+│   ├── platformio.ini
+│   └── src/
+│       └── main.cpp
+│
+├── VCU/
+│   ├── platformio.ini
+│   └── src/
+│       └── main.cpp
+│
+└── RaspberryPi/
+    └── dashboard/
+
 ## Getting Started
 
 ### Installation
