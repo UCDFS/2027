@@ -1,0 +1,11 @@
+{
+    "name": "Sensors",
+    "version": "1.0.0",
+    "dependencies": {
+      "Arduino": "*"
+    },
+    "build": {
+        "includeDir": "include",
+        "srcDir": "src"
+    }
+}

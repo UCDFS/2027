@@ -31,7 +31,7 @@ Frame breakdown tbd, we need:
 - GPS data
 - BMS readings
 - Motor torque
-
+```
 CAN frame bit structures (8-byte)
 [0][1-11][12][13-18][19-82][83-98][99-100][101-107][108-110]
 SOF  ID  RTR  CTRL   DATA    CRC     ACK    EOF       IFS
@@ -59,3 +59,4 @@ typedef struct CAN_message_t {
   uint8_t mb = 0;           // Hardware mailbox index used for RX or TX
   uint8_t bus = 0;          // Originating bus index (e.g., 1 for CAN1, 2 for CAN2)
 } CAN_message_t;
+```

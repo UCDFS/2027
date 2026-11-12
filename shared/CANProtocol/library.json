@@ -1,0 +1,11 @@
+{
+    "name": "CANProtocol",
+    "version": "1.0.0",
+    "dependencies": {
+      "FlexCAN_T4": "*"
+    },
+    "build": {
+        "includeDir": "include",
+        "srcDir": "src"
+    }
+}
