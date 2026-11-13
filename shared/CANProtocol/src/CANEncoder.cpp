@@ -27,17 +27,23 @@ namespace CAN
   CAN_message_t encodeAPPSData(struct APPSData data) {
     CAN_message_t msg = {0};
     msg.id = CAN_ID::APPS_DATA;
-    msg.len = 4;
-    msg.buf[0] = data.apps1 & 0xFF;
-    msg.buf[1] = (data.apps1 >> 8) & 0xFF;
-    msg.buf[2] = data.apps2 & 0xFF;
-    msg.buf[3] = (data.apps2 >> 8) & 0xFF;
+    msg.len = 2;
+    msg.buf[0] = data.appsPct1;
+    msg.buf[1] = data.appsPct2;
     return msg;
   }
 
-  // Remember to attach msg.id after
-  CAN_message_t encodeNodeData(struct NodeData data) {
+  CAN_message_t encodeRearNodeData(struct NodeData data) {
+    return encodeNodeData(data, CAN_ID::REAR_SENSORS);
+  }
+
+  CAN_message_t encodeFrontNodeData(struct NodeData data) {
+    return encodeNodeData(data, CAN_ID::FRONT_SENSORS);
+  }
+
+  CAN_message_t encodeNodeData(struct NodeData data, uint16_t canID) {
     CAN_message_t msg = {0};
+    msg.id = canID;
     msg.len = 7;
     msg.buf[0] = data.brakePressure;
     msg.buf[1] = data.leftWheelSpeed & 0xFF;
@@ -46,6 +52,22 @@ namespace CAN
     msg.buf[4] = (data.rightWheelSpeed >> 8) & 0xFF;
     msg.buf[5] = data.leftSuspension_cm;
     msg.buf[6] = data.rightSuspension_cm;
+    return msg;
+  }
+
+  CAN_message_t encodeFrontNodeHeartbeat(uint8_t status) {
+    return encodeNodeHeartbeat(status, CAN_ID::FRONT_HEARTBEAT);
+  }
+
+  CAN_message_t encodeRearNodeHeartbeat(uint8_t status) {
+    return encodeNodeHeartbeat(status, CAN_ID::REAR_HEARTBEAT);
+  }
+
+  CAN_message_t encodeNodeHeartbeat(uint8_t status, uint16_t canID) {
+    CAN_message_t msg = {0};
+    msg.id = canID;
+    msg.len = 1;
+    msg.buf[0] = status;
     return msg;
   }
 

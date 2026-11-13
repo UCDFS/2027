@@ -8,6 +8,8 @@
 #include "CANMessageIDs.h"
 #include "CANSignals.h"
 
+constexpr uint32_t CAN_BAUD_RATE = 500000;
+
 namespace CAN
 {
   uint16_t floatToUInt16(float value, float min, float max);

@@ -11,11 +11,10 @@ namespace CAN
   }
 
   // ---------- Sensor Bus ----------
-
   struct APPSData decodeAPPSData(const CAN_message_t &msg) {
     struct APPSData data;
-    data.apps1 = msg.buf[0] | (msg.buf[1] << 8);
-    data.apps2 = msg.buf[2] | (msg.buf[3] << 8);
+    data.appsPct1 = msg.buf[0];
+    data.appsPct2 = msg.buf[1];
     return data;
   }
 
@@ -29,6 +28,9 @@ namespace CAN
     return data;
   }
 
+  uint8_t decodeNodeHeartbeat(const CAN_message_t &msg) {
+    return msg.buf[0];
+  }
 
   struct IMUAccelData decodeIMUAccelData(const CAN_message_t &msg) {
     struct IMUAccelData data;

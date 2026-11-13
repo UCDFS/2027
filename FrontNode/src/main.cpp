@@ -14,6 +14,8 @@ void setup() {
 }
 
 void loop() {
+  uint8_t heartbeatStatus = 0x00; // Placeholder
+  Can1.write(CAN::encodeFrontNodeHeartbeat(heartbeatStatus));
   // Read sensors
   // Send CAN frame
 }

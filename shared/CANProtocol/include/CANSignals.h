@@ -3,9 +3,8 @@
 #include "CANProtocol.h"
 
 struct APPSData {
-  // TODO: should it be pct so only 2B needed
-  uint16_t apps1;
-  uint16_t apps2;
+  uint8_t appsPct1;
+  uint8_t appsPct2;
 };
 
 struct NodeData {

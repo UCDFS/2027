@@ -3,17 +3,19 @@
 
 
 
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can2;
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 
 
 void setup() {
   // Initialize CAN bus
-  Can2.begin();
-  Can2.setBaudRate(500000);
+  Can1.begin();
+  Can1.setBaudRate(CAN_BAUD_RATE);
   // Initialize sensors
 }
 
 void loop() {
+  uint8_t heartbeatStatus = 0x00; // Placeholder
+  Can1.write(CAN::encodeRearNodeHeartbeat(heartbeatStatus));
   // Read sensors
   // Send CAN frame
 }
