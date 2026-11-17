@@ -2,8 +2,7 @@
 
 #include <cstdint>
 
-float readAPPS();
-float readBPS();
+bool readApps(float* appsPct);
 
 // Placeholders until hardware is configured
 #define APPS1_PIN   A0   // ADC pin for APPS1 sensor

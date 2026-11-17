@@ -13,8 +13,7 @@ namespace CAN
   // ---------- Sensor Bus ----------
   struct APPSData decodeAPPSData(const CAN_message_t &msg) {
     struct APPSData data;
-    data.appsPct1 = msg.buf[0];
-    data.appsPct2 = msg.buf[1];
+    data.appsPct = msg.buf[0];
     return data;
   }
 

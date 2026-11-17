@@ -3,6 +3,7 @@
 
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
+uint8_t appsPct = 0;
 
 void setup() {
   // Initialize CAN bus
@@ -14,8 +15,9 @@ void setup() {
 }
 
 void loop() {
-  uint8_t heartbeatStatus = 0x00; // Placeholder
-  Can1.write(CAN::encodeFrontNodeHeartbeat(heartbeatStatus));
   // Read sensors
-  // Send CAN frame
+  readApps(&appsPct);
+
+  // Send CAN frames
+  Can1.write(CAN::encodeAPPSData({appsPct}));
 }
