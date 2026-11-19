@@ -24,7 +24,7 @@ bool readApps(uint8_t* appsPct) {
 
 // readBPS()
 
-// readSuspendion()
+// readSuspension()
 
 // readWheelSpeed()
 

@@ -15,9 +15,13 @@ void setup() {
 }
 
 void loop() {
-  // Read sensors
-  readApps(&appsPct);
+  // Read and send APPS
+  if (readApps(&appsPct)) {
+    Can1.write(CAN::encodeAPPSData({appsPct}));
+  } else {
+    Can1.write(CAN::encodeAPPSData({APPS_ERROR}));
+  }
 
-  // Send CAN frames
-  Can1.write(CAN::encodeAPPSData({appsPct}));
+  
+  
 }
