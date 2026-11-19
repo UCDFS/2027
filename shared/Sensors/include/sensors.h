@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include "IMU.h"
 
-bool readApps(float* appsPct);
+bool readApps(uint8_t* appsPct);
 
 // APPS
 #define APPS1_PIN      A0   // ADC pin for APPS1 sensor
@@ -45,6 +46,11 @@ bool readApps(float* appsPct);
 
 // GPS
 #define GPS_SERIAL Serial2
+
+// Adafruit MPU
+#define MPU_ACCEL_RANGE MPU6050_RANGE_8_G
+#define MPU_GYRO_RANGE MPU6050_RANGE_500_DEG
+#define MPU_FILTER_BW MPU6050_BAND_21_HZ
 
 // Non-sensor pins
 #define BRAKE_LIGHT_PIN    14  // Digital pin for brake light control

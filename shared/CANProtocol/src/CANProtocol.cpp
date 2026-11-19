@@ -20,4 +20,21 @@ namespace CAN
     return static_cast<float>(value) / 65535.0f * (max - min) + min;
   }
 
+  // Splitting IMU Data
+  IMUAccelData imuReadingToAccelData(IMUReading reading) {
+    return {
+      reading.ax,
+      reading.ay,
+      reading.az,
+    };
+  }
+
+  IMUAccelData imuReadingToGyroData(IMUReading reading) {
+    return {
+      reading.gx,
+      reading.gy,
+      reading.gz,
+      reading.temp;
+    };
+  }  
 }

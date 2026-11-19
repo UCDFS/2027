@@ -7,6 +7,8 @@
 
 #include "CANMessageIDs.h"
 #include "CANSignals.h"
+#include "CANEncoder.h"
+#include "CANDecoder.h"
 
 constexpr uint32_t CAN_BAUD_RATE = 500000;
 
@@ -14,4 +16,6 @@ namespace CAN
 {
   uint16_t floatToUInt16(float value, float min, float max);
   float uint16ToFloat(uint16_t value, float min, float max);
+  IMUAccelData imuReadingToAccelData(IMUReading reading);
+  IMUGyroTempData imuReadingToGyroData(IMUReading reading);
 }

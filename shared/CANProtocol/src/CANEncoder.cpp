@@ -16,7 +16,7 @@ namespace CAN
   CAN_message_t encodeInverterRequest(struct InverterRequestData data) {
     CAN_message_t msg = {0};
     msg.id = CAN_ID::INVERTER_COMMAND;
-    msg.len = INVERTERREQUESTDATA_LEN;
+    msg.len = INVERTER_REQUEST_DATA_LEN;
     msg.buf[0] = data.regRequest;
     msg.buf[1] = data.registerID;
     msg.buf[2] = data.interval_ms;
@@ -54,21 +54,6 @@ namespace CAN
     return msg;
   }
 
-  CAN_message_t encodeFrontNodeHeartbeat(uint8_t status) {
-    return encodeNodeHeartbeat(status, CAN_ID::FRONT_HEARTBEAT);
-  }
-
-  CAN_message_t encodeRearNodeHeartbeat(uint8_t status) {
-    return encodeNodeHeartbeat(status, CAN_ID::REAR_HEARTBEAT);
-  }
-
-  CAN_message_t encodeNodeHeartbeat(uint8_t status, uint16_t canID) {
-    CAN_message_t msg = {0};
-    msg.id = canID;
-    msg.len = static_cast<uint8_t>(sizeof(status));
-    msg.buf[0] = status;
-    return msg;
-  }
 
   CAN_message_t encodeIMUAccelData(struct IMUAccelData data) {
     CAN_message_t msg = {0};

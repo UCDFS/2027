@@ -42,7 +42,7 @@ struct InverterRequestData {
   uint8_t registerID;
   uint8_t interval_ms;
 };
-constexpr uint8_t INVERTERREQUESTDATA_LEN = 3;
+constexpr uint8_t INVERTER_REQUEST_DATA_LEN = 3;
 
 struct InverterReplyData {
   uint8_t registerID;
