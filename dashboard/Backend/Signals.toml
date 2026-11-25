@@ -1,0 +1,82 @@
+# Signal definitions for the dash backend
+
+# This is the one place that saus which signals exist. The store, the simulator.
+# the logger and the alert rules all read it, sa a signal added here show ups
+# everywhere. It does not depend on how the data arrives ( CAN, DBC or Ethernet).
+
+# Fields
+#       unit      the text shown besides the value("" if none)
+#       stale_after   seconds without an updatebefore the value counts as stale
+#       min, max      expected range, used by the sim and for sanity checks
+
+# Everything BELOW is PROVISIONAL:
+#   placeholders: units, range stale times
+
+[signals.speed_kph]
+# Quoted because TOML bare values cannot contain string units.
+unit = "kph"
+stale_after = 0.5
+min = 0
+max = 120
+
+[signals.rpm]
+unit = "rpm"
+stale_after = 0.5 
+min = 0
+max = 7000
+
+[signals.torque_cmd_pct]
+unit = "%"
+stale_after = 0.5
+min = 0
+max = 100
+
+[signals.dc_bus_voltage]
+unit = "V"
+stale_after = 2.0
+min = 0
+max = 600
+
+[signals.motor_temp]
+unit = "degC"
+stale_after = 2.0
+min = 0
+max = 125
+
+[signals.inverter_temp]
+unit = "degC"
+stale_after = 2.0
+min = 0
+# Range corrected so min is less than max.
+max = 125ef
+
+[signals.battery_pct]
+unit = "%"
+stale_after = 5.0
+min = 0
+max = 100
+
+[signals.susp_front]
+unit = "mm"
+stale_after = 0.5
+min = 0
+max = 100
+
+[signals.susp_rear]
+unit = "mm"
+stale_after = 0.5
+min = 0
+max = 100
+
+[signals.steering_deg]
+unit = "deg"
+stale_after = 0.5
+# Steering is allowed to be negative or positive within this range.
+min = -120
+max = 120
+
+[signals.lap_time_ms]
+unit = "ms"
+stale_after = 5.0
+min = 0
+max = 600000
